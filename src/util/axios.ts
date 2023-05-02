@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const defaultOptions = {
-  baseURL: process.env.REACT_APP_BASE_URL
+  baseURL: `${location.origin}/api/v1`
 }
 
 const instance = axios.create(defaultOptions)

@@ -1,16 +1,21 @@
-import React from 'react'
+import styled from 'styled-components'
 
-import './App.css'
 import Search from './Components/Search/Search'
 
 function App() {
   return (
     <div className="App">
-      <main>
+      <Main>
         <Search />
-      </main>
+      </Main>
     </div>
   )
 }
+
+const Main = styled.main`
+  display: flex;
+  justify-content: center;
+  margin-top: 5%;
+`
 
 export default App

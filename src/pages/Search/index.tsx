@@ -1,6 +1,8 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
+import styled from 'styled-components'
 
+import { Input } from '../../components/Input'
 import { useDebounce } from '../../hooks/useDebounce'
 
 interface SEARCH_ITEM {
@@ -12,7 +14,9 @@ const Search = () => {
   const [searchKeyword, setSearchKeyword] = useState<string>('')
   const [result, setResult] = useState<SEARCH_ITEM[]>([])
   const [loading, setLoading] = useState(false)
+
   const debouncedValue = useDebounce(searchKeyword)
+
   const handleChange = (e: React.ChangeEvent<HTMLElement>) => {
     const value = (e.target as HTMLInputElement).value
     setSearchKeyword(value)
@@ -44,17 +48,46 @@ const Search = () => {
 
   return (
     <main>
-      <input value={searchKeyword} onChange={handleChange} />
+      <InputWrap>
+        <Input
+          id="searchInput"
+          type="text"
+          name="search"
+          color="#333"
+          placeholder=""
+          value={searchKeyword}
+          onChange={handleChange}
+        >
+          {loading ? (
+            <div>검색중...</div>
+          ) : (
+            Array.isArray(result) &&
+            result.map((item: SEARCH_ITEM) => (
+              <div key={item.id}>{item.name}</div>
+            ))
+          )}
+        </Input>
+      </InputWrap>
       <button>검색</button>
-      {loading ? (
-        <div>검색중...</div>
-      ) : (
-        Array.isArray(result) &&
-        result.map((item: SEARCH_ITEM) => <div key={item.id}>{item.name}</div>)
-      )}
-      <div>current value: {debouncedValue}</div>
     </main>
   )
 }
 
 export default Search
+
+const InputWrap = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  padding-right: 8px;
+  background-color: #ffffff;
+  font-weight: 400;
+  font-size: 1rem;
+  border: 2px solid;
+  border-color: #ffffff;
+  border-radius: 42px;
+  line-height: 1.6;
+  letter-spacing: -0.018em;
+`

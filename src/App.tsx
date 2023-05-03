@@ -1,14 +1,32 @@
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 import { getDisease } from './service/getDisease'
 
 function App() {
   const [searchInput, setSearchInput] = useState('')
+  const [debounceInput, setDebouncInput] = useState('')
 
-  const onChangeSearchInput = async (e: any) => {
-    setSearchInput(e.target.value)
-    const { data } = await getDisease(e.target.value)
-    return data
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setDebouncInput(searchInput)
+    }, 500)
+    return () => {
+      clearTimeout(id)
+    }
+  }, [searchInput])
+
+  const getDiseaseList = useCallback(async () => {
+    const data = await getDisease(debounceInput)
+    console.log(data)
+  }, [debounceInput])
+
+  useEffect(() => {
+    getDiseaseList()
+  }, [getDiseaseList])
+
+  const onChangeSearchInput = (e: any) => {
+    const { value } = e.target
+    setSearchInput(value)
   }
 
   return (
@@ -16,6 +34,7 @@ function App() {
       <div>
         <input type="text" onChange={onChangeSearchInput} />
         <button>검색</button>
+        {debounceInput}
       </div>
       <div>
         <p>간세포암</p>

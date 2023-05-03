@@ -5,4 +5,5 @@ export interface ResultItem {
 
 export interface KeywordListProps {
   results: ResultItem[]
+  onClick: (selectedKeyword: string) => void
 }

@@ -31,14 +31,13 @@ export const searchWithCache = async function (
 ): Promise<ResultItem[]> {
   const cache = await caches.open(cacheName)
 
-  if (!(await isCacheExpired(cache, keyword))) {
-    const cachedResponse = await cache.match(keyword)
-    if (cachedResponse) {
-      console.log(`캐싱된 데이터가 있습니다: ${keyword}`)
-      return cachedResponse.json()
-    }
+  const cachedResponse = await cache.match(keyword)
+  if (!(await isCacheExpired(cache, keyword)) && cachedResponse) {
+    console.log(`캐싱된 데이터가 있습니다: ${keyword}`)
+    return cachedResponse.json()
   }
 
+  await cache.delete(`${keyword}_timestamp`)
   console.log(`캐싱된 데이터가 없어서 API 호출: ${keyword}`)
 
   const response = await getSearchKeyword(`${keyword}`)

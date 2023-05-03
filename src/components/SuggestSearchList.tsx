@@ -2,6 +2,7 @@ import React, { Dispatch, SetStateAction, useEffect, useRef } from 'react'
 import { BiSearch } from 'react-icons/bi'
 import styled from 'styled-components'
 
+import { useScrollToSelected } from '../hooks/useScrollToSelected'
 import { IDisease } from '../types/disease'
 
 interface IProps {
@@ -15,27 +16,7 @@ const SuggestSearchList = ({
   selectedIdx,
   setSelectedIdx
 }: IProps) => {
-  const suggestListRef = useRef<HTMLUListElement>(null)
-
-  useEffect(() => {
-    if (suggestListRef.current && selectedIdx !== -1) {
-      const selectedEl = suggestListRef.current.children[
-        selectedIdx
-      ] as HTMLLIElement
-      const listContainerRect = suggestListRef.current.getBoundingClientRect()
-      const selectedItemRect = selectedEl.getBoundingClientRect()
-
-      if (selectedItemRect.bottom > listContainerRect.bottom) {
-        suggestListRef.current.scrollTop +=
-          selectedItemRect.bottom - listContainerRect.bottom
-      } else if (selectedItemRect.top < listContainerRect.top) {
-        suggestListRef.current.scrollTop -=
-          listContainerRect.top - selectedItemRect.top
-      }
-    } else if (suggestListRef.current) {
-      suggestListRef.current.scrollTop = 0
-    }
-  }, [selectedIdx])
+  const suggestListRef = useScrollToSelected(selectedIdx)
 
   const renderList = () => {
     if (suggestList?.length === 0) {

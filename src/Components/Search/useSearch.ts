@@ -20,7 +20,17 @@ const useSearch = () => {
   const [searchInput, setSearchInput] = useState('')
   const [searchResult, setSearchResult] = useState<SearchData[]>([])
   const apiCallCnt = useRef(0)
+  const debounceRef = useRef<NodeJS.Timeout | null>(null)
   const { fetchData, removeExpiredCache } = useCache()
+
+  const goSearch = async (search: string) => {
+    const URL = `http://localhost:3000/api/v1/search-conditions/?name=${search}`
+    const cache = await caches.open('search')
+    const keys = await cache.keys()
+    await removeExpiredCache(cache, keys)
+    const result = await fetchData(cache, URL, apiCallCnt)
+    setSearchResult(result)
+  }
 
   const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -31,20 +41,23 @@ const useSearch = () => {
     }
 
     setRecentKeywords(searchInput)
-
-    const URL = `http://localhost:3000/api/v1/search-conditions/?name=${searchInput}`
-    const cache = await caches.open('search')
-    const keys = await cache.keys()
-
-    await removeExpiredCache(cache, keys)
-    const result = await fetchData(cache, URL, apiCallCnt)
-    setSearchResult(result)
+    await goSearch(searchInput)
   }
 
-  const onChangeHanlder = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onChangeHanlder = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInput(e.target.value)
 
-    // 디바운싱으로 검색 API 호출
+    if (e.target.value === '') {
+      return
+    }
+
+    if (debounceRef.current !== null) {
+      clearTimeout(debounceRef.current)
+    }
+
+    debounceRef.current = setTimeout(async () => {
+      await goSearch(e.target.value)
+    }, 300)
   }
 
   return {

@@ -1,3 +1,5 @@
+import { SearchData } from '../types'
+
 const isExpired = (response: Response) => {
   const cacheControl = response.headers.get('cache-control')
   const maxAge = cacheControl ? parseInt(cacheControl.split('=')[1]) : 1
@@ -48,7 +50,7 @@ export const fetchData = async (
 ) => {
   const existingCache = await cache.match(URL)
 
-  let result = []
+  let result = <[] | SearchData[]>[]
   if (existingCache) {
     result = await existingCache.json() // get data
   } else {

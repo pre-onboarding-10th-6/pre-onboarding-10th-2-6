@@ -11,7 +11,7 @@ export const getSearchKeyword = async (keyword: string) => {
       `api/v1/search-conditions/?name=${keyword}`
     )
     console.log('api called')
-    return response.data
+    return response
   } catch (error) {
     throw error
   }

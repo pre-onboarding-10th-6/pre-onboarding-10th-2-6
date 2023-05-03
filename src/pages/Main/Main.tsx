@@ -5,6 +5,7 @@ import { getSearchKeyword } from '../../api/api'
 import KeywordList from '../../components/KeywordList'
 import Searchbar from '../../components/Searchbar'
 import { ResultItem } from '../../types/type'
+import { searchWithCache } from '../../utils/cacheSearchResult'
 
 function Main() {
   const [keyword, setKeyword] = useState('')
@@ -13,7 +14,7 @@ function Main() {
   const sendRequest = useCallback(
     _.debounce(async (req: any) => {
       console.log(`Sending request with query: ${req}`)
-      const searchResultData = await getSearchKeyword(`${req}`)
+      const searchResultData = await searchWithCache(req)
       setSearchResults(searchResultData ?? [])
     }, 500),
     []

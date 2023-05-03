@@ -11,6 +11,7 @@ type InputProp = {
   placeholder: string
   children?: ReactNode
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void
+  onKeyDown?: any
 }
 
 export const Input = (props: InputProp) => {
@@ -23,7 +24,8 @@ export const Input = (props: InputProp) => {
     placeholder,
     onChange,
     color,
-    children
+    children,
+    onKeyDown
   } = props
   const [isFocus, setIsFocus] = useState(false)
   return (
@@ -39,6 +41,7 @@ export const Input = (props: InputProp) => {
         onChange={onChange}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
+        onKeyDown={onKeyDown}
       />
       <SearchContainer isFocus={isFocus}>{children}</SearchContainer>
     </InputWrap>

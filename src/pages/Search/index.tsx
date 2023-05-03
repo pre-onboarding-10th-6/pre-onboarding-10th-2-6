@@ -4,6 +4,7 @@ import styled from 'styled-components'
 
 import { Input } from '../../components/Input'
 import { useDebounce } from '../../hooks/useDebounce'
+import useKeyHandler from '../../hooks/useKeyHandler'
 
 interface SEARCH_ITEM {
   name: string
@@ -14,6 +15,7 @@ const Search = () => {
   const [searchKeyword, setSearchKeyword] = useState<string>('')
   const [result, setResult] = useState<SEARCH_ITEM[]>([])
   const [loading, setLoading] = useState(false)
+  const { handleKeyUpDown, selectedIdx } = useKeyHandler(result)
 
   const debouncedValue = useDebounce(searchKeyword)
 
@@ -35,6 +37,7 @@ const Search = () => {
           setResult(res)
         } else {
           const res = await axios.get(BASE_URL)
+          console.info('calling api')
           cacheStorage.put(BASE_URL, new Response(JSON.stringify(res.data)))
           setResult(res.data)
         }
@@ -57,13 +60,16 @@ const Search = () => {
           placeholder=""
           value={searchKeyword}
           onChange={handleChange}
+          onKeyDown={handleKeyUpDown}
         >
           {loading ? (
             <div>검색중...</div>
           ) : (
             Array.isArray(result) &&
-            result.map((item: SEARCH_ITEM) => (
-              <div key={item.id}>{item.name}</div>
+            result.map((item: SEARCH_ITEM, idx) => (
+              <Item key={item.id} tabIndex={0} isSelected={idx === selectedIdx}>
+                {item.name}
+              </Item>
             ))
           )}
         </Input>
@@ -90,4 +96,8 @@ const InputWrap = styled.div`
   border-radius: 42px;
   line-height: 1.6;
   letter-spacing: -0.018em;
+`
+
+const Item = styled.div<{ isSelected: boolean }>`
+  background-color: ${({ isSelected }) => (isSelected ? '#ddd' : '#fff')};
 `

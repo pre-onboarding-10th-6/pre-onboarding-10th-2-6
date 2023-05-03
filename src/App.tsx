@@ -10,7 +10,22 @@ import { IDisease } from './types/disease'
 function App() {
   const [searchInput, setSearchInput] = useState<string>('')
   const [suggestList, setSuggestList] = useState<IDisease[]>()
+  const [selectedIdx, setSelectedIdx] = useState<number>(-1)
+
   const debounceInput = useDebounce(searchInput)
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!suggestList) {
+      return
+    }
+    if (e.key === 'ArrowUp') {
+      const arrowUpIndex = Math.max(selectedIdx - 1, -1)
+      setSelectedIdx(arrowUpIndex)
+    } else if (e.key === 'ArrowDown') {
+      const arrowDownIndex = Math.min(selectedIdx + 1, suggestList.length - 1)
+      setSelectedIdx(arrowDownIndex)
+    }
+  }
 
   const getDiseaseList = useCallback(async () => {
     if (debounceInput === '') {
@@ -49,6 +64,7 @@ function App() {
             <input
               type="text"
               onChange={onChangeSearchInput}
+              onKeyDown={handleKeyDown}
               placeholder="질환명을 입력해 주세요."
             />
           </StInputWrap>
@@ -56,7 +72,13 @@ function App() {
             <BiSearch size={20} />
           </button>
         </StInputContainer>
-        {suggestList && <SuggestSearchList suggestList={suggestList} />}
+        {suggestList && (
+          <SuggestSearchList
+            suggestList={suggestList}
+            selectedIdx={selectedIdx}
+            setSelectedIdx={setSelectedIdx}
+          />
+        )}
       </StSearchContainer>
     </StLayout>
   )
@@ -72,7 +94,6 @@ const StLayout = styled.div`
 `
 
 const StSearchContainer = styled.div`
-  width: 360px;
   height: 500px;
   margin: 150px 0;
 `
@@ -86,7 +107,7 @@ const StInputContainer = styled.div`
   display: flex;
   align-items: center;
   position: relative;
-  width: 360px;
+
   background-color: white;
   border: 1px solid lightgray;
   border-radius: 30px;

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Dispatch, SetStateAction, useEffect, useRef } from 'react'
 import { BiSearch } from 'react-icons/bi'
 import styled from 'styled-components'
 
@@ -6,21 +6,32 @@ import { IDisease } from '../types/disease'
 
 interface IProps {
   suggestList: IDisease[]
+  selectedIdx: number
+  setSelectedIdx: Dispatch<SetStateAction<number>>
 }
 
-const SuggestSearchList = ({ suggestList }: IProps) => {
+const SuggestSearchList = ({
+  suggestList,
+  selectedIdx,
+  setSelectedIdx
+}: IProps) => {
   const renderList = () => {
     if (suggestList?.length === 0) {
       return <>검색어 없음</>
     }
     return (
       <>
-        {suggestList?.map(item => {
+        {suggestList.map((item, idx) => {
           return (
-            <li key={item.id}>
+            <StLi
+              key={item.id}
+              onMouseEnter={() => setSelectedIdx(idx)}
+              onMouseLeave={() => setSelectedIdx(-1)}
+              isActive={selectedIdx === idx}
+            >
               <BiSearch size={12} />
               <span>{item.name}</span>
-            </li>
+            </StLi>
           )
         })}
       </>
@@ -45,14 +56,16 @@ const StSuggestListContainer = styled.div`
 const StSuggestList = styled.ul`
   overflow-y: scroll;
   max-height: 200px;
-  li {
-    padding: 4px 16px;
-    font-size: 0.8rem;
-    :hover {
-      background-color: gray;
-    }
-  }
   svg {
     margin-right: 8px;
   }
+`
+
+interface IStLiProps {
+  readonly isActive: boolean
+}
+const StLi = styled.li<IStLiProps>`
+  padding: 4px 16px;
+  font-size: 0.8rem;
+  background-color: ${props => (props.isActive ? 'red' : 'green')};
 `

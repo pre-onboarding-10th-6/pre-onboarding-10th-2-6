@@ -17,8 +17,6 @@ const Search = () => {
     onMouseDownHandler
   } = useSearch()
 
-  console.log(searchState)
-
   const [isFocus, setIsFocus] = useState(false)
 
   return (

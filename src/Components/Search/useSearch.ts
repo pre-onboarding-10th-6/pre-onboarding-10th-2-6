@@ -28,8 +28,7 @@ const useSearch = () => {
 
   const searchAndGetResult = async (search: string) => {
     if (search === '') {
-      console.log('SEARCHasdasdnuiadsbjdashbads')
-      // return
+      return []
     }
 
     const URL = `${SEARCH_URL}${search}`
@@ -43,6 +42,7 @@ const useSearch = () => {
   const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
+    console.log('onSubmit')
     if (searchState.input.length === 0) {
       alert('값을 입력해주세요')
       return
@@ -56,14 +56,12 @@ const useSearch = () => {
   const onChangeHanlder = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchState({ ...searchState, input: e.target.value })
 
-    if (e.target.value === '') return
+    // if (e.target.value === '') return
     if (debounceRef.current !== null) clearTimeout(debounceRef.current)
 
     debounceRef.current = setTimeout(async () => {
       const result = await searchAndGetResult(e.target.value)
-      if (result !== undefined) {
-        setSearchState({ input: e.target.value, result })
-      }
+      setSearchState({ input: e.target.value, result })
     }, 200)
   }
 
@@ -86,12 +84,26 @@ const useSearch = () => {
             : setFocusedItem(prev => prev + 1)
           break
         case 'Enter':
-          // focus가 0,-1일 땐 break하고 기본동작(onSubmitHandler)을 취함
-          if (focusedItem <= 0) {
-            break
+          let autoSearch
+          // 최근검색어일 때 -> sessionStorage
+          if (searchState.input.length === 0) {
+            if (focusedItem === -1) {
+              // break하고 기본동작(onSubmitHandler)을 취함
+              break
+            }
+            const recentKeywords = JSON.parse(
+              sessionStorage.getItem(RECENT_KEYWORDS) as string
+            )
+            autoSearch = recentKeywords[focusedItem]
+          } else {
+            // 추천검색어일 때 ->
+            if (focusedItem <= 0) {
+              // break하고 기본동작(onSubmitHandler)을 취함
+              break
+            }
+            autoSearch = searchState.result[focusedItem - 1].name
           }
           e.preventDefault()
-          const autoSearch = searchState.result[focusedItem - 1].name
           setRecentKeywords(autoSearch)
           const result = await searchAndGetResult(autoSearch)
           setSearchState({ result, input: autoSearch })

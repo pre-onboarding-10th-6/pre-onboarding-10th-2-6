@@ -6,9 +6,16 @@ import { RECENT_KEYWORDS, SearchData } from '../../types'
 interface Props {
   searchResult: SearchData[]
   searchInput: string
+  focusedItem: number
+  searchItemCnt: React.MutableRefObject<HTMLUListElement | null>
 }
 
-const SearchList = ({ searchResult, searchInput }: Props) => {
+const SearchList = ({
+  searchResult,
+  searchInput,
+  focusedItem,
+  searchItemCnt
+}: Props) => {
   const recentKeywords = JSON.parse(
     sessionStorage.getItem(RECENT_KEYWORDS) as string
   )
@@ -18,7 +25,7 @@ const SearchList = ({ searchResult, searchInput }: Props) => {
       <>
         <p>최근 검색어</p>
         {recentKeywords.map((keyword: string, idx: number) => (
-          <Item key={idx}>
+          <Item key={idx} className={focusedItem === idx ? 'focused' : ''}>
             <IconSearch />
             {keyword}
           </Item>
@@ -32,9 +39,19 @@ const SearchList = ({ searchResult, searchInput }: Props) => {
       <p>검색 결과가 없습니다.</p>
     ) : (
       <>
+        <Item className={focusedItem === 0 ? 'focused' : ''}>
+          <IconSearch />
+          {searchInput}
+        </Item>
         <p>추천 검색어</p>
-        {searchResult.map(arr => (
-          <Item key={arr.id}>{arr.name}</Item>
+        {searchResult.splice(0, 7).map((arr, idx: number) => (
+          <Item
+            key={arr.id}
+            className={focusedItem === idx + 1 ? 'focused' : ''}
+          >
+            <IconSearch />
+            {arr.name}
+          </Item>
         ))}
       </>
     )
@@ -64,4 +81,10 @@ const List = styled.ul`
 const Item = styled.li`
   list-style: none;
   cursor: pointer;
+  &.focused {
+    background: rgb(248, 249, 250);
+  }
+  &:hover {
+    background: rgb(248, 249, 250);
+  }
 `

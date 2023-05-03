@@ -50,23 +50,15 @@ export const fetchData = async (
 ) => {
   const existingCache = await cache.match(URL)
 
-  let result = <[] | SearchData[]>[]
+  let result: SearchData[]
   if (existingCache) {
     result = await existingCache.json() // get data
   } else {
-    result = await fetch(URL).then(response => {
-      const responseWithHeader = getNewResponse(response)
-      cache.put(URL, responseWithHeader)
-      console.info(`Search API 호출 횟수 : ${(cnt.current += 1)}`)
-      return response.json()
-    })
+    const response = await fetch(URL)
+    const responseWithHeader = getNewResponse(response)
+    await cache.put(URL, responseWithHeader)
+    console.info(`Search API 호출 횟수 : ${(cnt.current += 1)}`)
+    result = await response.json()
   }
-
   return result
 }
-
-const useCache = () => {
-  return { fetchData, removeExpiredCache }
-}
-
-export default useCache

@@ -51,7 +51,7 @@ const Search = () => {
           onMouseDown={onMouseDownHandler}
         >
           <IconSearch />
-          {searchInput}
+          <Bold>{searchInput}</Bold>
         </Item>
         <p>추천 검색어</p>
         {searchResult.slice(0, 7).map((arr, idx: number) => (
@@ -61,7 +61,8 @@ const Search = () => {
             onMouseDown={onMouseDownHandler}
           >
             <IconSearch />
-            {arr.name}
+            <Bold>{searchInput}</Bold>
+            {arr.name.split(searchInput)[1]}
           </Item>
         ))}
       </>
@@ -101,6 +102,10 @@ const Form = styled.form`
   display: flex;
   flex-direction: column;
   gap: 8px;
+`
+
+const Bold = styled.span`
+  font-weight: 700;
 `
 
 const SearchBox = styled.div`

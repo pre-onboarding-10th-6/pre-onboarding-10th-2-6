@@ -54,7 +54,7 @@ const useSearch = () => {
 
     debounceRef.current = setTimeout(async () => {
       await goSearch(e.target.value)
-    }, 300)
+    }, 200)
   }
 
   const onKeyDownHandler = async (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -94,8 +94,17 @@ const useSearch = () => {
   const onMouseDownHandler = async (
     e: React.MouseEvent<HTMLLIElement, MouseEvent>
   ) => {
+    let search
+    if (e.currentTarget.childNodes[2] === undefined) {
+      search = e.currentTarget.childNodes[1].textContent
+    } else {
+      search =
+        e.currentTarget.childNodes[1].textContent +
+        '' +
+        e?.currentTarget?.childNodes[2].textContent
+    }
     console.log('click')
-    const search = e.currentTarget.childNodes[1].nodeValue
+    console.log(search)
     if (typeof search === 'string') {
       setRecentKeywords(search)
       await goSearch(search)

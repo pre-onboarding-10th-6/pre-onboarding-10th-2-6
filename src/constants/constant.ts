@@ -1,2 +1,2 @@
 export const CACHE_NAME = 'search-result-cache'
-export const EXPIRE_TIME = 60 * 60
+export const EXPIRE_TIME = 60 * 1000

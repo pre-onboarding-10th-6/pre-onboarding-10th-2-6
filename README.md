@@ -125,7 +125,7 @@ const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
   es module 을 인식못함
   해결방안 찾는중
 
-  - test case 는 '암' 을 1번쨰 입력시는 api 에서 받아오고 2번째 입력시 cache storage 에 받아오는 확인 하는 방안으로 작성
+  - test case 는 '암' 을 1번째 입력시는 api 에서 받아오고 2번째 입력시 cache storage 에 받아오는 확인 하는 방안으로 작성
 
 ```typescript
 import axios from 'axios'

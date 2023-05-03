@@ -14,6 +14,16 @@ const Search = () => {
   const { result, loading } = useSearchHandler(searchKeyword)
   const { handleKeyUpDown, selectedIdx } = useKeyHandler(result)
 
+  const validSearchKeyword = () =>
+    Array.isArray(result) &&
+    result.map((item: SEARCH_ITEM, idx) => (
+      <Item key={item.id} tabIndex={0} isSelected={idx === selectedIdx}>
+        {item.name}
+      </Item>
+    ))
+
+  const invalidSearchKeyword = () => <div>검색어 없음</div>
+
   return (
     <main>
       <InputWrap>
@@ -30,12 +40,11 @@ const Search = () => {
           {loading ? (
             <div>검색중...</div>
           ) : (
-            Array.isArray(result) &&
-            result.map((item: SEARCH_ITEM, idx) => (
-              <Item key={item.id} tabIndex={0} isSelected={idx === selectedIdx}>
-                {item.name}
-              </Item>
-            ))
+            <>
+              {result.length === 0
+                ? invalidSearchKeyword()
+                : validSearchKeyword()}
+            </>
           )}
         </Input>
       </InputWrap>

@@ -1,9 +1,19 @@
-import axios, { AxiosInstance } from 'axios'
+import axios, { AxiosInstance, AxiosResponse } from 'axios'
 
-const BASE_URL = ''
+import { SEARCH_ITEM } from '../types'
+
+const BASE_URL = '/api/v1/search-conditions'
 
 const defaultOptions = {
   baseURL: BASE_URL
 }
+const instance: AxiosInstance = axios.create(defaultOptions)
 
-export const instance: AxiosInstance = axios.create(defaultOptions)
+export const searchAPI = (
+  debouncedValue: string
+): Promise<AxiosResponse<SEARCH_ITEM[]>> =>
+  instance.get(`/?name=${debouncedValue}`, {
+    headers: {
+      'Cache-Control': 'max-age=86400'
+    }
+  })

@@ -1,53 +1,18 @@
-import axios from 'axios'
-import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { Input } from '../../components/Input'
-import { useDebounce } from '../../hooks/useDebounce'
+import useInputs from '../../hooks/useInputs'
 import useKeyHandler from '../../hooks/useKeyHandler'
-
-interface SEARCH_ITEM {
-  name: string
-  id: number
-}
+import useSearchHandler from '../../hooks/useSearchHandler'
+import { SEARCH_ITEM } from '../../types'
 
 const Search = () => {
-  const [searchKeyword, setSearchKeyword] = useState<string>('')
-  const [result, setResult] = useState<SEARCH_ITEM[]>([])
-  const [loading, setLoading] = useState(false)
+  const {
+    values: { searchKeyword },
+    handleChange
+  } = useInputs({ searchKeyword: '' })
+  const { result, loading } = useSearchHandler(searchKeyword)
   const { handleKeyUpDown, selectedIdx } = useKeyHandler(result)
-
-  const debouncedValue = useDebounce(searchKeyword)
-
-  const handleChange = (e: React.ChangeEvent<HTMLElement>) => {
-    const value = (e.target as HTMLInputElement).value
-    setSearchKeyword(value)
-  }
-
-  const BASE_URL = `/api/v1/search-conditions/?name=${debouncedValue}`
-
-  useEffect(() => {
-    async function handleSearch() {
-      setLoading(true)
-      const cacheStorage = await caches.open('search')
-      const cachedData = await cacheStorage.match(BASE_URL)
-      try {
-        if (cachedData) {
-          const res = await cachedData.json()
-          setResult(res)
-        } else {
-          const res = await axios.get(BASE_URL)
-          console.info('calling api')
-          cacheStorage.put(BASE_URL, new Response(JSON.stringify(res.data)))
-          setResult(res.data)
-        }
-      } catch (err) {
-        console.error(err)
-      }
-      setLoading(false)
-    }
-    handleSearch()
-  }, [debouncedValue])
 
   return (
     <main>
@@ -55,7 +20,7 @@ const Search = () => {
         <Input
           id="searchInput"
           type="text"
-          name="search"
+          name="searchKeyword"
           color="#333"
           placeholder=""
           value={searchKeyword}

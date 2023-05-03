@@ -2,6 +2,30 @@ import { useState, useRef } from 'react'
 
 import { SearchData, RECENT_KEYWORDS } from '../../types'
 
+const isExpired = (response: Response) => {
+  const cacheControl = response.headers.get('cache-control')
+  const maxAge = cacheControl ? parseInt(cacheControl.split('=')[1]) : 1
+  const date = new Date(response.headers.get('date') as string).getTime()
+  const expiration = date + maxAge * 1000
+  const isExpired = Math.ceil(expiration - new Date().getTime())
+
+  return isExpired < 0 ? true : false
+}
+
+const getNewResponse = (response: Response) => {
+  const cacheControl = 'public, max-age=10'
+  const headers = new Headers(response.headers)
+  headers.set('Cache-Control', cacheControl)
+  const date = new Date()
+  const options: Intl.DateTimeFormatOptions = {
+    timeZone: 'Asia/Seoul'
+  }
+  headers.set('date', date.toLocaleString('en-US', options))
+  return new Response(response.clone().body, {
+    headers
+  })
+}
+
 const setRecentKeywords = (searchInput: string) => {
   // Session Storage에 최근 검색어 저장하기
   if (sessionStorage.getItem(RECENT_KEYWORDS) !== null) {
@@ -28,27 +52,34 @@ const useSearch = () => {
       alert('값을 입력해주세요')
       return
     }
+    setRecentKeywords(searchInput)
 
     const URL = `http://localhost:3000/api/v1/search-conditions/?name=${searchInput}`
     const cache = await caches.open('search')
-    const existingCache = await cache.match(URL)
-    setRecentKeywords(searchInput)
+    const existingCache = await cache.match(URL).then(response => {
+      if (response) {
+        if (isExpired(response)) {
+          cache.delete(URL)
+          return null
+        }
+      }
+      return response
+    })
 
+    let result = []
     if (existingCache) {
       console.log('cache exist')
-      const result = await existingCache.json() // get data
-      console.log(result)
-      setSearchResult(result)
+      result = await existingCache.json() // get data
     } else {
       console.log('cache does not exist')
-      const res = await fetch(URL).then(response => {
-        cache.put(URL, response)
+      result = await fetch(URL).then(response => {
+        const responseWithHeader = getNewResponse(response)
+        cache.put(URL, responseWithHeader)
         console.info(`Search API 호출 횟수 : ${(apiCallCnt.current += 1)}`)
         return response.json()
       })
-      console.log(res) // get data
-      setSearchResult(res)
     }
+    setSearchResult(result)
   }
 
   const onChangeHanlder = (e: React.ChangeEvent<HTMLInputElement>) => {

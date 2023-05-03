@@ -15,6 +15,28 @@ const SuggestSearchList = ({
   selectedIdx,
   setSelectedIdx
 }: IProps) => {
+  const suggestListRef = useRef<HTMLUListElement>(null)
+
+  useEffect(() => {
+    if (suggestListRef.current && selectedIdx !== -1) {
+      const selectedEl = suggestListRef.current.children[
+        selectedIdx
+      ] as HTMLLIElement
+      const listContainerRect = suggestListRef.current.getBoundingClientRect()
+      const selectedItemRect = selectedEl.getBoundingClientRect()
+
+      if (selectedItemRect.bottom > listContainerRect.bottom) {
+        suggestListRef.current.scrollTop +=
+          selectedItemRect.bottom - listContainerRect.bottom
+      } else if (selectedItemRect.top < listContainerRect.top) {
+        suggestListRef.current.scrollTop -=
+          listContainerRect.top - selectedItemRect.top
+      }
+    } else if (suggestListRef.current) {
+      suggestListRef.current.scrollTop = 0
+    }
+  }, [selectedIdx])
+
   const renderList = () => {
     if (suggestList?.length === 0) {
       return <>검색어 없음</>
@@ -39,7 +61,9 @@ const SuggestSearchList = ({
   }
   return (
     <StSuggestListContainer>
-      <StSuggestList>{suggestList && renderList()}</StSuggestList>
+      <StSuggestList ref={suggestListRef}>
+        {suggestList && renderList()}
+      </StSuggestList>
     </StSuggestListContainer>
   )
 }

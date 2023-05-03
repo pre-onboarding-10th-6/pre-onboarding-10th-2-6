@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { BiSearch } from 'react-icons/bi'
 import styled from 'styled-components'
 
+import SuggestSearchList from './components/SuggestSearchList'
 import useDebounce from './hooks/useDebounce'
 import { getDisease } from './service/getDisease'
 import { IDisease } from './types/disease'
@@ -34,44 +35,28 @@ function App() {
     const { value } = e.target
     setSearchInput(value)
   }
-  const renderList = () => {
-    if (suggestList?.length === 0) {
-      return <>검색어 없음</>
-    }
-    return (
-      <>
-        {suggestList?.map(item => {
-          return <p key={item.id}>{item.name}</p>
-        })}
-      </>
-    )
-  }
 
   return (
     <StLayout>
       <StSearchContainer>
-        <h2>국내 모든 임상시험 검색하고</h2>
-        <h2>온라인으로 참여하기</h2>
+        <StTitle>
+          국내 모든 임상시험 검색하고
+          <br /> 온라인으로 참여하기
+        </StTitle>
         <StInputContainer>
-          <BiSearch size={20} />
-          <input
-            type="text"
-            onChange={onChangeSearchInput}
-            placeholder="질환명을 입력해 주세요."
-          />
+          <StInputWrap>
+            <BiSearch size={20} />
+            <input
+              type="text"
+              onChange={onChangeSearchInput}
+              placeholder="질환명을 입력해 주세요."
+            />
+          </StInputWrap>
           <button>
-            <BiSearch size={30} />
+            <BiSearch size={20} />
           </button>
-
-          {/* {debounceInput} */}
         </StInputContainer>
-        <StSuggestListContainer>
-          {suggestList &&
-            suggestList.map(item => {
-              return <div key={item.id}>{item.name}</div>
-            })}
-          {suggestList && renderList()}
-        </StSuggestListContainer>
+        {suggestList && <SuggestSearchList suggestList={suggestList} />}
       </StSearchContainer>
     </StLayout>
   )
@@ -90,10 +75,11 @@ const StSearchContainer = styled.div`
   width: 360px;
   height: 500px;
   margin: 150px 0;
-  h2 {
-    font-size: 1.5rem;
-    padding: 10px;
-  }
+`
+const StTitle = styled.h2`
+  font-size: 1.5rem;
+  line-height: 120%;
+  margin-bottom: 30px;
 `
 
 const StInputContainer = styled.div`
@@ -101,32 +87,29 @@ const StInputContainer = styled.div`
   align-items: center;
   position: relative;
   width: 360px;
-  /* margin-top: 100px; */
-
-  input {
-    width: 100%;
-    height: 30px;
-    border: 1px solid lightgray;
-    border-radius: 20px;
-    padding: 10px;
-  }
+  background-color: white;
+  border: 1px solid lightgray;
+  border-radius: 30px;
+  padding: 10px;
+  margin-bottom: 8px;
 
   button {
-    position: absolute;
-    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
     color: white;
     background-color: #007be9;
     border-radius: 100%;
   }
 `
-
-const StSuggestListContainer = styled.div`
-  text-align: left;
-  width: 360px;
-  background-color: white;
-  border-radius: 10px;
-  padding: 20px;
-  overflow-y: scroll;
-  max-height: 200px;
-  font-size: 0.8rem;
+const StInputWrap = styled.div`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  height: 30px;
+  input {
+    width: 100%;
+  }
 `

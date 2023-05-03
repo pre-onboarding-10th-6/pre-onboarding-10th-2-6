@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import React, { useState, useCallback } from 'react'
 
-import { getSearchKeyword } from '../../api/api'
 import KeywordList from '../../components/KeywordList'
 import Searchbar from '../../components/Searchbar'
 import { ResultItem } from '../../types/type'
@@ -13,9 +12,13 @@ function Main() {
 
   const sendRequest = useCallback(
     _.debounce(async (req: any) => {
-      console.log(`Sending request with query: ${req}`)
-      const searchResultData = await searchWithCache(req)
-      setSearchResults(searchResultData ?? [])
+      if (req.trim() !== '') {
+        console.log(`Sending request with query: ${req}`)
+        const searchResultData = await searchWithCache(req)
+        setSearchResults(searchResultData)
+      } else {
+        setSearchResults([])
+      }
     }, 500),
     []
   )

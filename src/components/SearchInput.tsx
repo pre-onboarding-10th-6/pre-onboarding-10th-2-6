@@ -31,10 +31,12 @@ const Button = styled.button`
   font-size: 1.2rem;
 `
 
-const SearchInput = () => {
+const SearchInput = ({
+  ...props
+}: React.InputHTMLAttributes<HTMLInputElement>) => {
   return (
     <Wrapper>
-      <Input placeholder="질환명을 입력해 주세요." />
+      <Input placeholder="질환명을 입력해 주세요." type="text" {...props} />
       <Button>검색</Button>
     </Wrapper>
   )

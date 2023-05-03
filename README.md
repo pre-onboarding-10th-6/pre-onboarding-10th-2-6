@@ -1,46 +1,120 @@
-# Getting Started with Create React App
+# week 2 assignment
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 로컬 캐시 구현
 
-## Available Scripts
+- JS의 built-in 자료구조인 `Map` 사용 (key - value 해시테이블)
+- in-memory caching
+- 새로고침하거나, 탭을 닫았다가 다시 열면 cache 증발 (JS 런타임이 바뀌기 때문)
+- `Map`을 래핑하는 클래스를 별도로 정의함(`CacheStore`)
+- 생성자 함수의 인자는 `duration`(만료기한)을 받음
+- 만료기한이 지난 value를 조회하는 경우 null 반환
 
-In the project directory, you can run:
+```typescript
+// src/utils/cacheStore.ts
+type Duration = {
+  hours: number;
+  minutes: number;
+  seconds: number;
+}
 
-### `npm start`
+class CacheStore {
+  private cache: Map<string, { expiration: number; conditions: Condition[] }>;
+  private duration: Duration;
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+  constructor(duration: Duration) {
+    this.cache = new Map();
+    this.duration = duration;
+  }
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+  get(key: string) {
+    const data = this.cache.get(key)
+    if (!data) return null
+    if (data.expiration < Date.now()) return null
+    return data.conditions
+  }
 
-### `npm test`
+  .
+  .
+  .
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+}
 
-### `npm run build`
+// src/App.tsx
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+const conditionSearchCache = new CacheStore({
+  hours: 0,
+  minutes: 15,
+  seconds: 0,
+})
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Event 최적화
 
-### `npm run eject`
+- 키보드 입력마다 API를 호출하는 것을 막기 위해 debouncing 적용
+  - debounce: 미리 지정한 시간간격(interval)사이에 입력이 끊이지 않고 계속해서 들어오는 경우 하나의 입력으로 처리
+  - 200ms 간격으로 지정
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```typescript
+// src/utils/index.ts
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+export function debounce<Params extends unknown[]>(
+func: (...args: Params) => unknown,
+timeout: number,
+): (...args: Params) => void {
+  let timer: NodeJS.Timeout
+  return (...args: Params) => {
+    clearTimeout(timer)
+    timer = setTimeout(() => {
+      func(...args)
+    }, timeout)
+  }
+}
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## UX
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+- 키보드만으로 추천 검색어들 사이에 이동 가능
+- `useIterator()` 커스텀 훅을 정의하여, 추천 검색어들 사이를 순회
 
-## Learn More
+```typescript
+// src/hooks/useIterator.ts
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+import { useState } from "react";
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+const useIterator = <T>(items: T[]) => {
+  const [index, setIndex] = useState(0);
+
+  const prev = () => {
+    let prevIndex
+    if (index === 0)
+      prevIndex = items.length - 1
+    else
+      prevIndex = index - 1
+
+    setIndex(prevIndex)
+  };
+
+  const next = () => {
+    let nextIndex
+    if (index === items.length - 1)
+      nextIndex = 0
+    else
+      nextIndex = index + 1
+
+    setIndex(nextIndex)
+  };
+
+  const item = items[index];
+
+  const reset = () => {
+    setIndex(0);
+  };
+
+  return [item, prev, next, reset] as const;
+}
+
+export default useIterator;
+
+```
+

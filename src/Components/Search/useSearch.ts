@@ -15,11 +15,11 @@ const isExpired = (response: Response) => {
 const getNewResponse = (response: Response) => {
   const cacheControl = 'public, max-age=10'
   const headers = new Headers(response.headers)
-  headers.set('Cache-Control', cacheControl)
   const date = new Date()
   const options: Intl.DateTimeFormatOptions = {
     timeZone: 'Asia/Seoul'
   }
+  headers.set('Cache-Control', cacheControl)
   headers.set('date', date.toLocaleString('en-US', options))
   return new Response(response.clone().body, {
     headers
@@ -27,7 +27,6 @@ const getNewResponse = (response: Response) => {
 }
 
 const setRecentKeywords = (searchInput: string) => {
-  // Session Storage에 최근 검색어 저장하기
   if (sessionStorage.getItem(RECENT_KEYWORDS) !== null) {
     const arr = JSON.parse(sessionStorage.getItem(RECENT_KEYWORDS) as string)
     sessionStorage.setItem(
@@ -52,19 +51,27 @@ const useSearch = () => {
       alert('값을 입력해주세요')
       return
     }
+
     setRecentKeywords(searchInput)
 
     const URL = `http://localhost:3000/api/v1/search-conditions/?name=${searchInput}`
     const cache = await caches.open('search')
-    const existingCache = await cache.match(URL).then(response => {
-      if (response) {
-        if (isExpired(response)) {
-          cache.delete(URL)
-          return null
-        }
-      }
-      return response
-    })
+    const keys = await cache.keys()
+
+    if (keys.length) {
+      await Promise.all(
+        keys.map(async request => {
+          const response = await cache.match(request)
+          if (response && isExpired(response)) {
+            await cache.delete(request)
+            return null
+          }
+          return response
+        })
+      )
+    }
+
+    const existingCache = await cache.match(URL)
 
     let result = []
     if (existingCache) {

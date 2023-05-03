@@ -2,22 +2,14 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { BiSearch } from 'react-icons/bi'
 import styled from 'styled-components'
 
+import useDebounce from './hooks/useDebounce'
 import { getDisease } from './service/getDisease'
 import { IDisease } from './types/disease'
 
 function App() {
   const [searchInput, setSearchInput] = useState<string>('')
-  const [debounceInput, setDebouncInput] = useState<string>('')
   const [suggestList, setSuggestList] = useState<IDisease[]>()
-
-  useEffect(() => {
-    const id = setTimeout(() => {
-      setDebouncInput(searchInput)
-    }, 500)
-    return () => {
-      clearTimeout(id)
-    }
-  }, [searchInput])
+  const debounceInput = useDebounce(searchInput)
 
   const getDiseaseList = useCallback(async () => {
     if (debounceInput === '') {

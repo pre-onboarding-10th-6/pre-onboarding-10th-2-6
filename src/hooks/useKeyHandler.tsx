@@ -12,7 +12,11 @@ const useKeyHandler = (result: any): any => {
         break
       case 'ArrowDown':
         event.preventDefault()
-        setSelectedIdx((prev: any) => Math.min(prev + 1, result.length - 1))
+        if (selectedIdx === 5) {
+          setSelectedIdx(0)
+        } else {
+          setSelectedIdx((prev: any) => Math.min(prev + 1, result.length - 1))
+        }
         break
       case 'Enter':
         event.preventDefault()

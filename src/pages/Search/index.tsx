@@ -1,3 +1,4 @@
+import { GrSearch } from 'react-icons/gr'
 import styled from 'styled-components'
 
 import { Input } from '../../components/Input'
@@ -16,62 +17,116 @@ const Search = () => {
 
   const validSearchKeyword = () =>
     Array.isArray(result) &&
-    result.map((item: SEARCH_ITEM, idx) => (
+    result.slice(0, 6).map((item: SEARCH_ITEM, idx) => (
       <Item key={item.id} tabIndex={0} isSelected={idx === selectedIdx}>
-        {item.name}
+        <SearchItem>
+          <GrSearch className="search-icon" style={{ marginRight: '8px' }} />
+          {item.name}
+        </SearchItem>
       </Item>
     ))
 
-  const invalidSearchKeyword = () => <div>검색어 없음</div>
+  const invalidSearchKeyword = () => <Text>검색어 없음</Text>
 
   return (
-    <main>
-      <InputWrap>
-        <Input
-          id="searchInput"
-          type="text"
-          name="searchKeyword"
-          color="#333"
-          placeholder=""
-          value={searchKeyword}
-          onChange={handleChange}
-          onKeyDown={handleKeyUpDown}
-        >
-          {loading ? (
-            <div>검색중...</div>
-          ) : (
+    <Main>
+      <Head>
+        국내 모든 임상시험 검색하고
+        <br />
+        온라인으로 참여하기
+      </Head>
+      <SearchWrap>
+        <SearchInput>
+          <Input
+            id="searchInput"
+            type="text"
+            name="searchKeyword"
+            placeholder="질환명을 입력해주세요."
+            value={searchKeyword}
+            onChange={handleChange}
+            onKeyDown={handleKeyUpDown}
+          >
+            {loading ? (
+              <Text>검색중...</Text>
+            ) : (
+              <>
+                {result.length === 0
+                  ? invalidSearchKeyword()
+                  : validSearchKeyword()}
+              </>
+            )}
+          </Input>
+          <SearchIcon>
             <>
-              {result.length === 0
-                ? invalidSearchKeyword()
-                : validSearchKeyword()}
+              <GrSearch className="search-icon" />
             </>
-          )}
-        </Input>
-      </InputWrap>
-      <button>검색</button>
-    </main>
+          </SearchIcon>
+        </SearchInput>
+      </SearchWrap>
+    </Main>
   )
 }
 
 export default Search
 
-const InputWrap = styled.div`
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+const Main = styled.main`
   width: 100%;
-  padding-right: 8px;
-  background-color: #ffffff;
-  font-weight: 400;
-  font-size: 1rem;
-  border: 2px solid;
-  border-color: #ffffff;
-  border-radius: 42px;
-  line-height: 1.6;
+  padding: 80px 0 160px;
+  background-color: #cae9ff;
+`
+
+const Head = styled.h1`
+  font-size: 2.125rem;
+  font-weight: 700;
   letter-spacing: -0.018em;
+  line-height: 1.6;
+  text-align: center;
+  margin-bottom: 40px;
+`
+
+const SearchWrap = styled.div`
+  width: 100%;
+  margin: 0 auto;
+`
+
+const SearchInput = styled.div`
+  display: flex;
+  position: relative;
+  width: 400px;
+  margin: 0 auto;
+`
+
+const SearchIcon = styled.button`
+  position: absolute;
+  right: -10px;
+  margin: 8px 0;
+  padding: 6px 10px;
+  background: #007be9;
+  font-size: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 99;
+
+  path {
+    stroke: #fff;
+  }
 `
 
 const Item = styled.div<{ isSelected: boolean }>`
-  background-color: ${({ isSelected }) => (isSelected ? '#ddd' : '#fff')};
+  margin-bottom: 16px;
+  padding: 12px 18px;
+  background-color: ${({ isSelected }) => (isSelected ? '#f5f5f5' : '#fff')};
+  cursor: pointer;
+  &:hover {
+    background-color: #f5f5f5;
+  }
+`
+
+const SearchItem = styled.div`
+  display: flex;
+  align-item: center;
+`
+
+const Text = styled.div`
+  padding: 12px 24px;
 `

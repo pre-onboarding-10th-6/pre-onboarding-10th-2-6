@@ -7,7 +7,7 @@ type InputProp = {
   name: string
   value: string
   labelText?: string
-  color: string
+  color?: string
   placeholder: string
   children?: ReactNode
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void
@@ -50,25 +50,32 @@ export const Input = (props: InputProp) => {
 
 const InputWrap = styled.div`
   position: relative;
-  background: green;
+  width: 420px;
+  margin-left: -15px;
 `
 
 const SearchContainer = styled.div<{ isFocus: boolean }>`
   display: ${({ isFocus }) => (isFocus ? 'block' : 'none')};
   position: absolute;
-  top: 100%;
+  top: 110%;
   left: 0;
-  width: 100%;
-  height: 200px;
-  overflow-y: scroll;
-  background-color: orange;
-  padding: 8px;
-  border: 1px solid #333;
+  width: 440px;
+  height: 320px;
+  padding: 20px 0;
+  background-color: #fff;
+  border: none;
+  border-radius: 24px;
+  box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.05);
 `
 
 const StyledInput = styled.input`
-  font-size: 20px;
-  padding: 8px;
-  border: 1px solid #333;
-  color: ${props => props.color};
+  width: 100%;
+  padding: 20px 0px 20px 24px;
+  color: #333;
+  font-size: 1.125rem;
+  border: none;
+  border-radius: 42px;
+  ::placeholder {
+    color: #d1d1d1;
+  }
 `

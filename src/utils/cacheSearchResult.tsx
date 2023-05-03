@@ -9,21 +9,36 @@ const isCacheExpired = async (
   keyword: string
 ): Promise<boolean> => {
   const timestampResponse = await cache.match(`${keyword}_timestamp`)
-  if (!timestampResponse) return true
-
-  console.log(`------------만료기간 테스트-----------`)
+  if (!timestampResponse) return false
 
   const timestampText = await timestampResponse.text()
-  console.log(`timestampText: ${timestampText}`)
-
   const cachedTime = parseInt(timestampText)
-  console.log(`cachedTime: ${cachedTime}`)
-
   const currentTime = Date.now()
-  console.log(`currentTime: ${currentTime}`)
-  console.log(currentTime - cachedTime > cacheTtl)
-  console.log(`-------------------------------------`)
-  return currentTime - cachedTime > cacheTtl
+  const isExpired = currentTime - cachedTime > cacheTtl
+
+  return isExpired
+}
+
+const clearExpiredCache = async (cache: Cache): Promise<void> => {
+  const keys = await cache.keys()
+
+  const checkCaches = keys.map(async key => {
+    const keyword = key.url
+
+    const isExpired = await isCacheExpired(cache, keyword)
+    return isExpired ? keyword : null
+  })
+
+  const expiredCaches = (await Promise.all(checkCaches)).filter(
+    data => data !== null
+  ) as string[]
+
+  const deleteCaches = expiredCaches.map(async key => {
+    await cache.delete(key)
+    await cache.delete(`${key}_timestamp`)
+  })
+
+  await Promise.all(deleteCaches)
 }
 
 export const searchWithCache = async function (
@@ -31,25 +46,23 @@ export const searchWithCache = async function (
 ): Promise<ResultItem[]> {
   const cache = await caches.open(cacheName)
 
+  // 만료된 cache 삭제
+  await clearExpiredCache(cache)
+
   const cachedResponse = await cache.match(keyword)
-  if (!(await isCacheExpired(cache, keyword)) && cachedResponse) {
-    console.log(`캐싱된 데이터가 있습니다: ${keyword}`)
+  const timestampResponse = await cache.match(`${keyword}_timestamp`)
+
+  if (cachedResponse && !(await isCacheExpired(cache, keyword))) {
+    console.log('캐쉬데이터반환')
     return cachedResponse.json()
   }
 
-  await cache.delete(`${keyword}_timestamp`)
-  console.log(`캐싱된 데이터가 없어서 API 호출: ${keyword}`)
-
   const response = await getSearchKeyword(`${keyword}`)
-
-  // cache.put의 2번째 인자로 response타입이 들어가야한다고 함
-  // 기존 response가 axiosReponse 타입이기 때문에 new Response를 이용해서 response 객체로 변경해줘야 정상작동
   const responseForCache = new Response(JSON.stringify(response.data))
+
   await cache.put(keyword, responseForCache)
 
-  // timestampResponse가 먼저 있는지 확인 후 저장
-  const timestampResponse = await cache.match(`${keyword}_timestamp`)
-  if (!timestampResponse) {
+  if (!timestampResponse || (await isCacheExpired(cache, keyword))) {
     const timestamp = new Response(Date.now().toString())
     await cache.put(`${keyword}_timestamp`, timestamp)
   }

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 
 import { getExpirationDate } from '../utils/cache'
 
-interface useCacheProps<T> {
+interface UseCacheProps<T> {
   initialData: T
   name: string
   key: string
@@ -16,7 +16,7 @@ const useCache = <T>({
   key,
   duration,
   fetchData
-}: useCacheProps<T>) => {
+}: UseCacheProps<T>) => {
   const [cachedData, setCachedData] = useState(initialData)
 
   useEffect(() => {

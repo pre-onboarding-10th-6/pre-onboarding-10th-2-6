@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { getSuggestions } from '../api/search'
-import { CACHE_DURATION, CACHE_SUGGESTIONS } from '../constants/cache'
+import { CACHE_SUGGESTIONS, CACHE_DURATION } from '../constants/cache'
+import useCache from '../hooks/useCache'
 import useDebounce from '../hooks/useDebounce'
 import useInput from '../hooks/useInput'
 import { Suggestion } from '../types/search'
-import { getExpirationDate } from '../utils/cache'
 
 import SearchBar from './SearchBar'
 import SearchSuggestions from './SearchSuggestions'
@@ -38,9 +38,15 @@ const Search = () => {
   const { value: keyword, setValue: setKeyword, handleChange } = useInput('')
   const debouncedKeyword = useDebounce<string>(keyword, 250)
 
-  const [searchBarFocused, setSearchBarFocused] = useState(false)
+  const { cachedData: suggestions } = useCache<Suggestion[]>({
+    initialData: [],
+    name: CACHE_SUGGESTIONS,
+    key: debouncedKeyword,
+    duration: CACHE_DURATION,
+    fetchData: getSuggestions
+  })
 
-  const [suggestions, setSuggestions] = useState<Suggestion[]>([])
+  const [searchBarFocused, setSearchBarFocused] = useState(false)
   const [focusIndex, setFocusIndex] = useState<number>(-1)
 
   const handleChangeKeyword = (
@@ -84,55 +90,6 @@ const Search = () => {
   }
 
   useEffect(() => {
-    const fetchSuggestions = async () => {
-      try {
-        const cacheStorage = await caches.open(CACHE_SUGGESTIONS)
-        const newSuggestions = await getSuggestions(debouncedKeyword)
-
-        await cacheStorage.put(
-          debouncedKeyword,
-          new Response(JSON.stringify(newSuggestions), {
-            headers: {
-              Expires: getExpirationDate(CACHE_DURATION)
-            }
-          })
-        )
-
-        setSuggestions(newSuggestions)
-      } catch (error) {
-        console.error(error)
-      }
-    }
-
-    const checkCacheExpiration = async () => {
-      try {
-        const cacheStorage = await caches.open(CACHE_SUGGESTIONS)
-        const cache = await cacheStorage.match(debouncedKeyword)
-
-        if (!cache) {
-          fetchSuggestions()
-          return
-        }
-
-        const expires = cache.headers.get('Expires')
-
-        if (!expires) {
-          setSuggestions(await cache.json())
-          return
-        }
-
-        const expiresDate = new Date(expires)
-        const currentDate = new Date()
-
-        expiresDate <= currentDate
-          ? fetchSuggestions()
-          : setSuggestions(await cache.json())
-      } catch (error) {
-        console.error(error)
-      }
-    }
-
-    debouncedKeyword ? checkCacheExpiration() : setSuggestions([])
     setFocusIndex(-1)
   }, [debouncedKeyword])
 

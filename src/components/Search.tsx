@@ -152,7 +152,7 @@ const Search = () => {
           handleFocus={() => setSearchBarFocused(true)}
           handleBlur={() => setSearchBarFocused(false)}
         />
-        {1 && (
+        {searchBarFocused && (
           <SearchSuggestions
             suggestions={suggestions}
             focusIndex={focusIndex}

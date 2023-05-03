@@ -18,8 +18,17 @@ function App() {
   }, [searchInput])
 
   const getDiseaseList = useCallback(async () => {
-    const data = await getDisease(debounceInput)
-    setSuggestList(data)
+    if (debounceInput === '') {
+      setSuggestList(undefined)
+      return
+    }
+    try {
+      const data = await getDisease(debounceInput)
+      setSuggestList(data)
+    } catch (error) {
+      console.error(error)
+      setSuggestList(undefined)
+    }
   }, [debounceInput])
 
   useEffect(() => {
@@ -30,7 +39,19 @@ function App() {
     const { value } = e.target
     setSearchInput(value)
   }
-
+  const renderList = () => {
+    if (suggetList?.length === 0) {
+      return <>검색어 없음</>
+    }
+    return (
+      <>
+        {suggetList?.map(item => {
+          return <p key={item.id}>{item.name}</p>
+        })}
+      </>
+    )
+  }
+  console.log(suggetList)
   return (
     <>
       <div>
@@ -43,6 +64,7 @@ function App() {
           suggetList.map(item => {
             return <p key={item.id}>{item.name}</p>
           })}
+        {suggetList && renderList()}
       </div>
     </>
   )

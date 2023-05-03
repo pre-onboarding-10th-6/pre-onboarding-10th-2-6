@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react'
 
 import { getDisease } from './service/getDisease'
+import { IDisease } from './types/disease'
 
 function App() {
-  const [searchInput, setSearchInput] = useState('')
-  const [debounceInput, setDebouncInput] = useState('')
+  const [searchInput, setSearchInput] = useState<string>('')
+  const [debounceInput, setDebouncInput] = useState<string>('')
+  const [suggetList, setSuggestList] = useState<IDisease[]>()
 
   useEffect(() => {
     const id = setTimeout(() => {
@@ -17,14 +19,14 @@ function App() {
 
   const getDiseaseList = useCallback(async () => {
     const data = await getDisease(debounceInput)
-    console.log(data)
+    setSuggestList(data)
   }, [debounceInput])
 
   useEffect(() => {
     getDiseaseList()
   }, [getDiseaseList])
 
-  const onChangeSearchInput = (e: any) => {
+  const onChangeSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target
     setSearchInput(value)
   }
@@ -37,10 +39,10 @@ function App() {
         {debounceInput}
       </div>
       <div>
-        <p>간세포암</p>
-        <p>간세포암</p>
-        <p>간세포암</p>
-        <p>간세포암</p>
+        {suggetList &&
+          suggetList.map(item => {
+            return <p key={item.id}>{item.name}</p>
+          })}
       </div>
     </>
   )

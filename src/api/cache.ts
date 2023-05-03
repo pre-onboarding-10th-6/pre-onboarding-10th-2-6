@@ -1,5 +1,8 @@
 import { SearchData } from '../types'
 
+export const SEARCH_URL = `http://localhost:3000/api/v1/search-conditions/?name=`
+export const SEARCH_STORAGE = 'search'
+
 const isExpired = (response: Response) => {
   const cacheControl = response.headers.get('cache-control')
   const maxAge = cacheControl ? parseInt(cacheControl.split('=')[1]) : 1

@@ -2,8 +2,8 @@ import { useState } from 'react'
 import styled from 'styled-components'
 
 import { ReactComponent as IconSearch } from '../../icons/IconSearch.svg'
-import { RECENT_KEYWORDS } from '../../types'
 
+import SearchList from './SearchList'
 import useSearch from './useSearch'
 
 const Search = () => {
@@ -11,63 +11,15 @@ const Search = () => {
     onSubmitHandler,
     onChangeHanlder,
     onKeyDownHandler,
-    searchResult,
-    searchInput,
+    searchState,
     focusedItem,
     searchItemCnt,
     onMouseDownHandler
   } = useSearch()
 
+  console.log(searchState)
+
   const [isFocus, setIsFocus] = useState(false)
-  const recentKeywords = JSON.parse(
-    sessionStorage.getItem(RECENT_KEYWORDS) as string
-  )
-
-  const RecentKeyword = () => {
-    return (
-      <>
-        <p>최근 검색어</p>
-        {recentKeywords.map((keyword: string, idx: number) => (
-          <Item
-            key={idx}
-            className={focusedItem === idx ? 'focused' : ''}
-            onMouseDown={onMouseDownHandler}
-          >
-            <IconSearch />
-            {keyword}
-          </Item>
-        ))}
-      </>
-    )
-  }
-
-  const SearchResult = () => {
-    return searchResult.length === 0 ? (
-      <p>검색 결과가 없습니다.</p>
-    ) : (
-      <>
-        <Item
-          className={focusedItem === 0 ? 'focused' : ''}
-          onMouseDown={onMouseDownHandler}
-        >
-          <IconSearch />
-          <Bold>{searchInput}</Bold>
-        </Item>
-        <p>추천 검색어</p>
-        {searchResult.slice(0, 7).map((arr, idx: number) => (
-          <Item
-            key={arr.id}
-            className={focusedItem === idx + 1 ? 'focused' : ''}
-            onMouseDown={onMouseDownHandler}
-          >
-            <IconSearch />
-            <Bold>{searchInput}</Bold>
-            {arr.name.split(searchInput)[1]}
-          </Item>
-        ))}
-      </>
-    )
-  }
 
   return (
     <Form
@@ -78,7 +30,7 @@ const Search = () => {
       <SearchBox>
         <input
           type="search"
-          value={searchInput}
+          value={searchState.input}
           onChange={onChangeHanlder}
           onKeyDown={onKeyDownHandler}
           placeholder="질환명을 입력해 주세요."
@@ -89,9 +41,12 @@ const Search = () => {
       </SearchBox>
 
       {isFocus && (
-        <List ref={searchItemCnt}>
-          {searchInput.length === 0 ? <RecentKeyword /> : <SearchResult />}
-        </List>
+        <SearchList
+          searchState={searchState}
+          focusedItem={focusedItem}
+          searchItemCnt={searchItemCnt}
+          onMouseDownHandler={onMouseDownHandler}
+        />
       )}
     </Form>
   )
@@ -102,10 +57,6 @@ const Form = styled.form`
   display: flex;
   flex-direction: column;
   gap: 8px;
-`
-
-const Bold = styled.span`
-  font-weight: 700;
 `
 
 const SearchBox = styled.div`
@@ -129,29 +80,6 @@ const SearchBox = styled.div`
   }
   button {
     display: contents;
-  }
-`
-
-const List = styled.ul`
-  border: 1px solid rgb(194, 200, 206);
-  border-radius: 20px;
-  padding: 24px;
-  padding-bottom: 16px;
-  box-shadow: rgba(30, 32, 37, 0.1) 0px 2px 10px;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-`
-
-const Item = styled.li`
-  list-style: none;
-  cursor: pointer;
-  &.focused {
-    background: rgb(248, 249, 250);
-  }
-  &:hover {
-    background: rgb(248, 249, 250);
   }
 `
 

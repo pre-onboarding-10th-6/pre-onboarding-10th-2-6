@@ -1,59 +1,69 @@
 import { useState, useRef } from 'react'
 
+import { SEARCH_URL, SEARCH_STORAGE } from '../../api/cache'
 import { fetchData, removeExpiredCache } from '../../api/cache'
-import { SearchData, RECENT_KEYWORDS } from '../../types'
+import { RECENT_KEYWORDS, SearchState } from '../../types'
 
-const setRecentKeywords = (searchInput: string) => {
+const setRecentKeywords = (search: string) => {
   if (sessionStorage.getItem(RECENT_KEYWORDS) !== null) {
     const arr = JSON.parse(sessionStorage.getItem(RECENT_KEYWORDS) as string)
     sessionStorage.setItem(
       RECENT_KEYWORDS,
-      JSON.stringify([searchInput, ...arr.splice(0, 6)])
+      JSON.stringify([search, ...arr.splice(0, 6)])
     )
   } else {
-    sessionStorage.setItem(RECENT_KEYWORDS, JSON.stringify([searchInput]))
+    sessionStorage.setItem(RECENT_KEYWORDS, JSON.stringify([search]))
   }
 }
 
 const useSearch = () => {
-  const [searchInput, setSearchInput] = useState('')
-  const [searchResult, setSearchResult] = useState<SearchData[]>([])
+  const [searchState, setSearchState] = useState<SearchState>({
+    input: '',
+    result: []
+  })
   const [focusedItem, setFocusedItem] = useState(-1)
   const apiCallCnt = useRef(0)
   const debounceRef = useRef<NodeJS.Timeout | null>(null)
   const searchItemCnt = useRef<HTMLUListElement | null>(null)
 
-  const goSearch = async (search: string) => {
-    if (search === '') return
+  const searchAndGetResult = async (search: string) => {
+    if (search === '') {
+      console.log('SEARCHasdasdnuiadsbjdashbads')
+      // return
+    }
 
-    const URL = `http://localhost:3000/api/v1/search-conditions/?name=${search}`
-    const cache = await caches.open('search')
+    const URL = `${SEARCH_URL}${search}`
+    const cache = await caches.open(SEARCH_STORAGE)
     const keys = await cache.keys()
     await removeExpiredCache(cache, keys)
     const result = await fetchData(cache, URL, apiCallCnt)
-    setSearchResult(result)
+    return result
   }
 
   const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    if (searchInput.length === 0) {
+    if (searchState.input.length === 0) {
       alert('값을 입력해주세요')
       return
     }
 
-    setRecentKeywords(searchInput)
-    await goSearch(searchInput)
+    setRecentKeywords(searchState.input)
+    const result = await searchAndGetResult(searchState.input)
+    setSearchState({ ...searchState, result })
   }
 
   const onChangeHanlder = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchInput(e.target.value)
+    setSearchState({ ...searchState, input: e.target.value })
 
     if (e.target.value === '') return
     if (debounceRef.current !== null) clearTimeout(debounceRef.current)
 
     debounceRef.current = setTimeout(async () => {
-      await goSearch(e.target.value)
+      const result = await searchAndGetResult(e.target.value)
+      if (result !== undefined) {
+        setSearchState({ input: e.target.value, result })
+      }
     }, 200)
   }
 
@@ -76,15 +86,15 @@ const useSearch = () => {
             : setFocusedItem(prev => prev + 1)
           break
         case 'Enter':
+          // focus가 0,-1일 땐 break하고 기본동작(onSubmitHandler)을 취함
           if (focusedItem <= 0) {
-            // focus가 0,-1일 땐 break하고 기본동작(onSubmitHandler)을 취함
             break
           }
           e.preventDefault()
-          const autoSearch = searchResult[focusedItem - 1].name
+          const autoSearch = searchState.result[focusedItem - 1].name
           setRecentKeywords(autoSearch)
-          await goSearch(autoSearch)
-          setSearchInput(autoSearch)
+          const result = await searchAndGetResult(autoSearch)
+          setSearchState({ result, input: autoSearch })
           setFocusedItem(-1)
           break
       }
@@ -107,8 +117,8 @@ const useSearch = () => {
     console.log(search)
     if (typeof search === 'string') {
       setRecentKeywords(search)
-      await goSearch(search)
-      setSearchInput(search)
+      const result = await searchAndGetResult(search)
+      setSearchState({ result, input: search })
     }
   }
 
@@ -118,8 +128,7 @@ const useSearch = () => {
     onKeyDownHandler,
     onMouseDownHandler,
     focusedItem,
-    searchResult,
-    searchInput,
+    searchState,
     searchItemCnt
   }
 }

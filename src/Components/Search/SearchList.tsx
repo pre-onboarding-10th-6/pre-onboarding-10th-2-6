@@ -1,65 +1,82 @@
 import styled from 'styled-components'
 
 import { ReactComponent as IconSearch } from '../../icons/IconSearch.svg'
-import { RECENT_KEYWORDS, SearchData } from '../../types'
+import { RECENT_KEYWORDS, SearchState } from '../../types'
 
 interface Props {
-  searchResult: SearchData[]
-  searchInput: string
+  searchState: SearchState
   focusedItem: number
   searchItemCnt: React.MutableRefObject<HTMLUListElement | null>
+  onMouseDownHandler: (
+    e: React.MouseEvent<HTMLLIElement, MouseEvent>
+  ) => Promise<void>
+}
+
+interface ItemProps {
+  children: string | React.ReactNode
+  classStatement: string
 }
 
 const SearchList = ({
-  searchResult,
-  searchInput,
+  searchState,
   focusedItem,
-  searchItemCnt
+  searchItemCnt,
+  onMouseDownHandler
 }: Props) => {
   const recentKeywords = JSON.parse(
     sessionStorage.getItem(RECENT_KEYWORDS) as string
   )
 
+  const SearchResultItem = ({ children, classStatement }: ItemProps) => {
+    return (
+      <Item className={classStatement} onMouseDown={onMouseDownHandler}>
+        <IconSearch />
+        <p>{children}</p>
+      </Item>
+    )
+  }
+
   const RecentKeyword = () => {
     return (
       <>
-        <p>최근 검색어</p>
-        {recentKeywords.map((keyword: string, idx: number) => (
-          <Item key={idx} className={focusedItem === idx ? 'focused' : ''}>
-            <IconSearch />
+        <Text>최근 검색어</Text>
+        {recentKeywords?.map((keyword: string, idx: number) => (
+          <SearchResultItem
+            key={idx}
+            classStatement={focusedItem === idx ? 'focused' : ''}
+          >
             {keyword}
-          </Item>
+          </SearchResultItem>
         ))}
       </>
     )
   }
 
   const SearchResult = () => {
-    return searchResult.length === 0 ? (
+    return searchState.result.length === 0 ? (
       <p>검색 결과가 없습니다.</p>
     ) : (
       <>
-        <Item className={focusedItem === 0 ? 'focused' : ''}>
-          <IconSearch />
-          {searchInput}
-        </Item>
-        <p>추천 검색어</p>
-        {searchResult.splice(0, 7).map((arr, idx: number) => (
-          <Item
+        <SearchResultItem classStatement={focusedItem === 0 ? 'focused' : ''}>
+          <Bold>{searchState.input}</Bold>
+        </SearchResultItem>
+        <Text>추천 검색어</Text>
+        {searchState.result.slice(0, 7).map((arr, idx: number) => (
+          <SearchResultItem
             key={arr.id}
-            className={focusedItem === idx + 1 ? 'focused' : ''}
+            classStatement={focusedItem === idx + 1 ? 'focused' : ''}
           >
-            <IconSearch />
-            {arr.name}
-          </Item>
+            <Bold>{searchState.input}</Bold>
+            {arr.name.split(searchState.input)[1]}
+          </SearchResultItem>
         ))}
       </>
     )
   }
 
   return (
-    <List>
-      {searchInput.length === 0 ? <RecentKeyword /> : <SearchResult />}
+    <List ref={searchItemCnt}>
+      {searchState.input.length === 0 ? <RecentKeyword /> : <SearchResult />}
     </List>
   )
 }
@@ -69,22 +86,38 @@ export default SearchList
 const List = styled.ul`
   border: 1px solid rgb(194, 200, 206);
   border-radius: 20px;
-  padding: 24px;
+  padding: 12px;
   padding-bottom: 16px;
   box-shadow: rgba(30, 32, 37, 0.1) 0px 2px 10px;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px 16px;
 `
 
 const Item = styled.li`
   list-style: none;
   cursor: pointer;
+  display: flex;
+  gap: 4px;
+  padding: 8px;
+  p {
+    margin: 0;
+  }
   &.focused {
     background: rgb(248, 249, 250);
   }
   &:hover {
     background: rgb(248, 249, 250);
   }
+`
+
+const Bold = styled.span`
+  font-weight: 700;
+`
+
+const Text = styled.p`
+  margin: 0;
+  font-size: 14px;
+  color: gray;
 `

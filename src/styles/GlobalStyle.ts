@@ -62,16 +62,22 @@ input {
     border: initial;
 }
 
+input:focus {
+    outline: none;
+}
+
 html {
     font-size: 62.5%;
-    max-width: 450px;
-    background-color: lightgrey;
     margin: 0 auto;
 }
 
 body {
     font-size: 1.6rem;
     line-height: 1.25;
+}
+
+* {
+	box-sizing: border-box;
 }
 `
 

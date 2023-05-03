@@ -21,7 +21,11 @@ const Search = () => {
 
   return (
     <Form
-      onSubmit={onSubmitHandler}
+      onSubmit={e =>
+        searchState.input === ''
+          ? alert('값을 입력해주세요')
+          : onSubmitHandler(e)
+      }
       onBlur={() => setIsFocus(false)}
       onFocus={() => setIsFocus(true)}
     >

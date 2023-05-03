@@ -1,7 +1,8 @@
 import styled from 'styled-components'
 
 import { ReactComponent as IconSearch } from '../../icons/IconSearch.svg'
-import { RECENT_KEYWORDS, SearchState } from '../../types'
+import { SearchState } from '../../types'
+import { getRecentKeywords } from '../../utils/recentKeywords'
 
 interface Props {
   searchState: SearchState
@@ -23,9 +24,7 @@ const SearchList = ({
   searchItemCnt,
   onMouseDownHandler
 }: Props) => {
-  const recentKeywords = JSON.parse(
-    sessionStorage.getItem(RECENT_KEYWORDS) as string
-  )
+  const recentKeywords = getRecentKeywords()
 
   const SearchResultItem = ({ children, classStatement }: ItemProps) => {
     return (

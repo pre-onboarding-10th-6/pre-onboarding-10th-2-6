@@ -21,7 +21,6 @@ const fetchDiseaseFromCache = async (cacheStorage: Cache, str: string) => {
   const cachedStorageData = await cacheStorage.match(str)
 
   if (cachedStorageData && isCacheValid(cachedStorageData)) {
-    console.log('캐시가 유효함')
     return cachedStorageData.json()
   }
 
@@ -44,7 +43,6 @@ const fetchDiseaseFromAPI = async (
     await cacheStorage.put(str, cachedData)
     return data
   } catch (error) {
-    console.error('API에서 데이터 가져오는 중 오류 발생:', error)
     throw error
   }
 }
@@ -56,7 +54,6 @@ const getDisease = async (str: string) => {
   if (cachedData) {
     return cachedData
   } else {
-    console.log('캐시 사용 불가능하거나 만료됨')
     return fetchDiseaseFromAPI(str, cacheStorage)
   }
 }

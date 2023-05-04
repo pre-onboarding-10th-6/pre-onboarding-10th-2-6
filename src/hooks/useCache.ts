@@ -41,21 +41,29 @@ const useCache = <T>({
         const cacheStorage = await caches.open(name)
         const cache = await cacheStorage.match(key)
 
-        if (!cache) {
-          fetch()
-          return
+        if (cache?.status === 200) {
+          console.info('returning cached result for', name)
+          try {
+            await fetch()
+            return
+          } catch (error) {
+            console.log('Failed to parse cached data as JSON:', error)
+            await cacheStorage.delete(key)
+          }
         }
 
-        const expires = cache.headers.get('Expires')
+        const expires = cache?.headers.get('Expires')
 
         if (!expires) {
-          setCachedData(await cache.json())
+          setCachedData(await cache?.json())
           return
         }
 
         const expiresDate = new Date(expires)
         const currentDate = new Date()
-        expiresDate <= currentDate ? fetch() : setCachedData(await cache.json())
+        expiresDate <= currentDate
+          ? fetch()
+          : setCachedData(await cache?.json())
       } catch (error) {
         console.error(error)
       }

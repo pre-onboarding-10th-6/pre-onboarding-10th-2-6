@@ -68,7 +68,7 @@ const SearchSuggestions = ({
   return (
     <SearchSuggestionsLayout>
       <p className="title">추천 검색어</p>
-      {/* <ul ref={ulRef}>
+      <ul ref={ulRef}>
         {suggestions.length ? (
           suggestions.map(({ id, name }, index) => (
             <li
@@ -83,7 +83,7 @@ const SearchSuggestions = ({
         ) : (
           <p className="empty">검색어 없음</p>
         )}
-      </ul> */}
+      </ul>
     </SearchSuggestionsLayout>
   )
 }

@@ -1,10 +1,12 @@
 # 기업 과제 (1) 👫
 
+<br/><br/>
+
 ## 목표
 
 - 검색창 구현 + 검색어 추천 기능 구현 + 캐싱 기능 구현
 
-<br/>
+<br/><br/>
 
 ## 세부 구현 사항
 
@@ -59,7 +61,7 @@ const useSearchHandler = (searchKeyword: string) => {
 위의 코드를 보면, useDebounce라는 커스텀 훅을 사용하여 입력된 searchKeyword를 디바운스 처리한다. 검색어를 입력할 때마다 매번 API 요청을 보내는 것이 아니라 일정 시간 후에 마지막으로 입력된 검색어를 기반으로 API 요청을 보낸다.
 이때 캐시 저장소를 사용하여 이전에 요청한 검색어의 결과를 저장하고, 동일한 검색어가 입력될 때 API 요청 대신 캐시된 데이터를 사용한다. 캐시 저장소를 사용한 이유는 대규모의 데이터를 다루는 데에 적합하고, 검색 결과와 같이 자주 변경되지 않는 데이터를 캐싱하는데 효과적이기 때문이다.
 
-<br/>
+<br/><br/>
 
 - expire time 구현
   <br/>
@@ -101,6 +103,7 @@ input 이벤트가 발생할 때마다 타이머를 설정한다. 300ms동안 �
 <br/>
 
 - 키보드만으로 추천 검색어들로 이동 가능하도록 구현
+
 ```javascript
 const useKeyHandler = (result: any): any => {
   const [selectedIdx, setSelectedIdx] = useState(-1)
@@ -133,11 +136,8 @@ const useKeyHandler = (result: any): any => {
 
   return { handleKeyUpDown, selectedIdx }
 }
-
 ````
 
 커스텀 훅 useKeyHandler을 사용하여 키보드의 방향키로 이동 가능하다. selectedIdx는 현재 선택된 항목의 인덱스를 저장하고, 초기값으로 -1을 가진다. handleKeyUpDown 함수는 event 객체를 매개변수로 받아 키보드 이벤트 정보를 추출한다. 각각의 이벤트 조건에 따라 selectedIdx 값을 변화시킨다.
-
-<br/>
 
 또한, ArrowDown 키가 눌린 상태이고 현재 선택된 항목이 마지막 항목이라면(selectedIdx === 5), 첫번째 항목을 선택할 수 있게 한다. 엔터키가 눌리면,해당 인덱스의 name 속성값을 콘솔에 출력한다.

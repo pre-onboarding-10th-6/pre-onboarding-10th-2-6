@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { Data } from '../App'
+import { SearchData } from '../App'
 
 const SearchResultWrapper = styled.ul`
   width: 100%;
@@ -29,16 +29,20 @@ const SearchResultItem = styled.li`
 `
 
 interface SearchResultProps {
-  results: Data[]
+  results: SearchData[]
 }
 
 const SearchResult = ({ results }: SearchResultProps) => {
   return (
     <SearchResultWrapper>
       <Title>추천 검색어</Title>
-      {results.map(result => (
-        <SearchResultItem key={result.id}>{result.name}</SearchResultItem>
-      ))}
+      {results && results.length > 0 ? (
+        results.map(result => (
+          <SearchResultItem key={result.id}>{result.name}</SearchResultItem>
+        ))
+      ) : (
+        <div>검색어 없음</div>
+      )}
     </SearchResultWrapper>
   )
 }

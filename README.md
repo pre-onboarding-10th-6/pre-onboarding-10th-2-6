@@ -143,7 +143,7 @@ export const useDebounce = (value: string, delay = 500) => {
 ```
 #### 'handleKeyDown()'
   1. suggestList가 없는 경우 바로 return 함으로써 추천 목록이 없을 때는 키 이벤트를 무시함.
-  2. 위쪽 화살표 키가 눌린 경우, selectedIdx 값을 하나 감소시키되, 최소값은 -1(검색창 위치)로 설정함. setSelectedIdx 함수를 사용하여 선택된 인덱스를 업데이트.
+  2. 위쪽 화살표 키가 눌린 경우, selectedIdx 값을 하나 감소시키되, 최소값은 -1로 설정함. setSelectedIdx 함수를 사용하여 선택된 인덱스를 업데이트.
   3. 아래쪽 화살표 키가 눌린 경우, selectedIdx 값을 하나 증가시키되, 최대값은 suggestList.length - 1(추천 검색어 리스트 하단부)로 설정함. setSelectedIdx 함수를 사용하여 선택된 인덱스를 업데이트합.
 
 ## 3-2. UX
@@ -183,7 +183,7 @@ export const useScrollToSelected = (selectedIdx: number) => {
 #### 'useScrollToSelected()'
   1. scrollListRef라는 이름의 useRef hook을 사용하여 HTMLUListElement 타입의 참조를 생성.
   2. useEffect hook을 사용하여 선택된 인덱스(selectedIdx)가 변경될 때마다 스크롤 처리를 수행.
-  3. useEffect 내부에서, scrollListRef.current가 존재하고 selectedIdx가 -1(검색창 위치)이 아닌 경우에만 스크롤 처리를 수행.
+  3. useEffect 내부에서, scrollListRef.current가 존재하고 selectedIdx가 -1이 아닌 경우에만 스크롤 처리를 수행.
   4. getBoundingClientRect() 메서드를 사용해 선택된 항목(selectedEl)과 목록 컨테이너(scrollListRef.current)의 크기(위치) 정보를 가져옴.
   5. 선택된 항목이 목록 컨테이너의 아래쪽 경계를 벗어난 경우, 목록 컨테이너의 스크롤 위치를 아래로 이동시키고, 선택된 항목이 목록 컨테이너의 위쪽 경계를 벗어난 경우, 목록 컨테이너의 스크롤 위치를 위로 이동시킴.
   6. scrollListRef.current가 존재하지만 selectedIdx가 -1인 경우, 목록 컨테이너의 스크롤 위치를 맨 위로 이동시킵니다.

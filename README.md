@@ -79,7 +79,7 @@ const getDisease = async (str: string) => {
 #### 'isCacheValid()'
   1.  캐시된 응답의 헤더에서 만료 시간 값을 가져옴.
   2.  현재 시간이 만료 시간 이전이면 true를 반환.
-### 'fetchDiseaseFromCache()'
+#### 'fetchDiseaseFromCache()'
   1. cacheStorage.match(str)을 사용하여 주어진 질병 이름에 대한 캐시된 데이터를 가져옴.
   2. 캐시된 데이터가 존재하고, 캐시가 유효한 경우, 캐시된 데이터를 JSON 형식으로 반환.
   3. 캐시된 데이터가 없거나 캐시가 만료된 경우, null을 반환.

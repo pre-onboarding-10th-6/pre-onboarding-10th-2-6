@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-export const MainWrapper = styled.main`
+export const SearchMainWrapper = styled.main`
   display: flex;
   background-color: #cae9ff;
   flex-direction: column;
@@ -9,7 +9,7 @@ export const MainWrapper = styled.main`
   height: 100vh;
 `
 
-export const MainHeading = styled.h2`
+export const SearchMainHeading = styled.h2`
   font-size: 2.125rem;
   font-weight: 700;
   letter-spacing: -0.018em;
@@ -18,7 +18,7 @@ export const MainHeading = styled.h2`
   text-align: center;
 `
 
-export const MainSection = styled.section`
+export const SearchMainSection = styled.section`
   display: flex;
   flex-direction: column;
   align-items: center;

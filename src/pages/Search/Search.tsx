@@ -2,17 +2,30 @@ import _ from 'lodash'
 import React, { useState, useCallback } from 'react'
 
 import KeywordList from '../../components/KeywordList'
-import Searchbar from '../../components/Searchbar'
+import SearchBar from '../../components/SearchBar'
 import { DELAY_TIME } from '../../constants/constant'
+import useKeyboardNavigation from '../../hooks/useKeyboardNavigation'
 import { ResultItem } from '../../types/type'
 import { searchWithCache } from '../../utils/cacheSearchResult'
 
-import { MainHeading, MainSection, MainWrapper } from './MainStyle'
+import {
+  SearchMainHeading,
+  SearchMainSection,
+  SearchMainWrapper
+} from './SearchStyle'
 
-function Main() {
+function Search() {
   const [keyword, setKeyword] = useState('')
   const [searchResults, setSearchResults] = useState<ResultItem[]>([])
   const [isSearchbarFocused, setIsSearchbarFocused] = useState(false)
+
+  const { selectedIndex, handleKeyDown } = useKeyboardNavigation(
+    searchResults.length,
+    index => {
+      const selectedKeyword = searchResults[index]?.name || ''
+      setKeyword(selectedKeyword)
+    }
+  )
 
   const sendRequest = useCallback(
     _.debounce(async (req: string) => {
@@ -37,6 +50,14 @@ function Main() {
     })
   }
 
+  const handleSearchbarKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (searchResults.length > 0) {
+      e.preventDefault()
+      setIsSearchbarFocused(true)
+      handleKeyDown(e as unknown as React.KeyboardEvent<HTMLUListElement>)
+    }
+  }
+
   const handleSearchbarFocus = () => {
     setIsSearchbarFocused(true)
   }
@@ -55,23 +76,32 @@ function Main() {
   }
 
   return (
-    <MainWrapper>
-      <MainHeading>
+    <SearchMainWrapper>
+      <SearchMainHeading>
         국내 모든 임상시험 검색하고
         <br />
         온라인으로 참여하기
-      </MainHeading>
-      <MainSection onFocus={handleSearchbarFocus} onBlur={handleSearchbarBlur}>
-        <Searchbar keyword={keyword} onChange={handleSearchBarChange} />
+      </SearchMainHeading>
+      <SearchMainSection
+        onFocus={handleSearchbarFocus}
+        onBlur={handleSearchbarBlur}
+      >
+        <SearchBar
+          keyword={keyword}
+          onChange={handleSearchBarChange}
+          onKeyDown={handleSearchbarKeyDown}
+        />
         {isSearchbarFocused && (
           <KeywordList
             results={searchResults}
             onClick={handleKeywordListClick}
+            onKeyDown={handleKeyDown}
+            selectedIndex={selectedIndex}
           />
         )}
-      </MainSection>
-    </MainWrapper>
+      </SearchMainSection>
+    </SearchMainWrapper>
   )
 }
 
-export default Main
+export default Search

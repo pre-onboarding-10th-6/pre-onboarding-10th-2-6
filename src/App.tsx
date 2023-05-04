@@ -1,9 +1,9 @@
 import React from 'react'
 
-import Main from './pages/Main/Main'
+import Search from './pages/Search/Search'
 
 function App() {
-  return <Main />
+  return <Search />
 }
 
 export default App

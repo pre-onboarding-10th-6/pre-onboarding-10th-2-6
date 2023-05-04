@@ -2,6 +2,7 @@ import React from 'react'
 import { BiSearch } from 'react-icons/bi'
 import styled from 'styled-components'
 
+import useScrollToSelected from '../hooks/useScrollToSelected'
 import { Suggestion } from '../types/search'
 
 const SearchSuggestionsLayout = styled.ul`
@@ -12,6 +13,11 @@ const SearchSuggestionsLayout = styled.ul`
   border-radius: 20px;
   background: #fff;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+
+  ul {
+    overflow-y: scroll;
+    max-height: 200px;
+  }
 
   li {
     display: flex;
@@ -59,23 +65,26 @@ const SearchSuggestions = ({
   focusIndex,
   handleChangeKeyword
 }: SearchSuggestionsProps) => {
+  const ulRef = useScrollToSelected(focusIndex)
   return (
     <SearchSuggestionsLayout>
       <p className="title">추천 검색어</p>
-      {suggestions.length ? (
-        suggestions.map(({ id, name }, index) => (
-          <li
-            key={id}
-            className={focusIndex === index ? 'focus' : ''}
-            onMouseDown={e => handleChangeKeyword(e, name)}
-          >
-            <BiSearch size={20} className="icon" />
-            <p>{name}</p>
-          </li>
-        ))
-      ) : (
-        <p className="empty">검색어 없음</p>
-      )}
+      <ul ref={ulRef}>
+        {suggestions.length ? (
+          suggestions.map(({ id, name }, index) => (
+            <li
+              key={id}
+              className={focusIndex === index ? 'focus' : ''}
+              onMouseDown={e => handleChangeKeyword(e, name)}
+            >
+              <BiSearch size={20} className="icon" />
+              <p>{name}</p>
+            </li>
+          ))
+        ) : (
+          <p className="empty">검색어 없음</p>
+        )}
+      </ul>
     </SearchSuggestionsLayout>
   )
 }

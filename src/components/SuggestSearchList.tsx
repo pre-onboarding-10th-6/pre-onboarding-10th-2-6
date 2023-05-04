@@ -1,7 +1,8 @@
-import React, { Dispatch, SetStateAction, useEffect, useRef } from 'react'
+import React, { Dispatch, SetStateAction } from 'react'
 import { BiSearch } from 'react-icons/bi'
 import styled from 'styled-components'
 
+import { color } from '../assets/colors'
 import { useScrollToSelected } from '../hooks/useScrollToSelected'
 import { IDisease } from '../types/disease'
 
@@ -20,7 +21,7 @@ const SuggestSearchList = ({
 
   const renderList = () => {
     if (suggestList?.length === 0) {
-      return <>검색어 없음</>
+      return <StLi>검색어 없음</StLi>
     }
     return (
       <>
@@ -42,6 +43,7 @@ const SuggestSearchList = ({
   }
   return (
     <StSuggestListContainer>
+      <StSearch>추천검색어</StSearch>
       <StSuggestList ref={suggestListRef}>
         {suggestList && renderList()}
       </StSuggestList>
@@ -54,9 +56,13 @@ export default SuggestSearchList
 const StSuggestListContainer = styled.div`
   text-align: left;
   width: 360px;
-  background-color: white;
+  background-color: ${color.WHITE};
   border-radius: 10px;
-  padding: 16px 0 0;
+  padding: 16px 0;
+  overflow: hidden;
+`
+const StSearch = styled.p`
+  padding: 4px 16px;
 `
 const StSuggestList = styled.ul`
   overflow-y: scroll;
@@ -67,10 +73,10 @@ const StSuggestList = styled.ul`
 `
 
 interface IStLiProps {
-  readonly isActive: boolean
+  readonly isActive?: boolean
 }
 const StLi = styled.li<IStLiProps>`
   padding: 4px 16px;
   font-size: 0.8rem;
-  background-color: ${props => (props.isActive ? 'red' : 'green')};
+  background-color: ${props => (props.isActive ? color.HOVER : 'none')};
 `

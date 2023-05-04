@@ -76,6 +76,13 @@ const getDisease = async (str: string) => {
   }
 }
 ```
+#### 'isCacheValid()'
+  1.  캐시된 응답의 헤더에서 만료 시간 값을 가져옴.
+  2.  현재 시간이 만료 시간 이전이면 true를 반환.
+### 'fetchDiseaseFromCache()'
+  1. cacheStorage.match(str)을 사용하여 주어진 질병 이름에 대한 캐시된 데이터를 가져옴.
+  2. 캐시된 데이터가 존재하고, 캐시가 유효한 경우, 캐시된 데이터를 JSON 형식으로 반환.
+  3. 캐시된 데이터가 없거나 캐시가 만료된 경우, null을 반환.
 #### 'fetchDiseaseFromAPI()'
   1. instance.get() 메서드를 사용해 주어진 질병 이름에 해당하는 데이터를 API에서 가져와서 data 변수에 저장.
   2. 가져온 데이터를 JSON 문자열로 변환한 후, 새로운 Response 객체를 생성하고 만료 날짜를 헤더에 설정함. getExpireDate 함수를 사용하여 만료 시간 계산.

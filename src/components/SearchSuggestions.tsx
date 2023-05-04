@@ -2,7 +2,7 @@ import React from 'react'
 import { BiSearch } from 'react-icons/bi'
 import styled from 'styled-components'
 
-import { Suggestion } from '../types/search'
+import { Disease } from '../types/disease'
 
 const SearchSuggestionsLayout = styled.ul`
   position: absolute;
@@ -46,7 +46,7 @@ const SearchSuggestionsLayout = styled.ul`
 `
 
 interface SearchSuggestionsProps {
-  suggestions: Suggestion[]
+  suggestions: Disease[]
   focusIndex: number
   handleChangeKeyword: (
     e: React.MouseEvent<HTMLLIElement>,

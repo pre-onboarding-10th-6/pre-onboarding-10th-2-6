@@ -8,7 +8,12 @@ const useKeyHandler = (result: any): any => {
     switch (key) {
       case 'ArrowUp':
         event.preventDefault()
-        setSelectedIdx((prev: any) => Math.max(prev - 1, -1))
+        setSelectedIdx((prev: any) => {
+          if (prev === -1) {
+            return result.length - 1
+          }
+          return Math.max(prev - 1, 0)
+        })
         break
       case 'ArrowDown':
         event.preventDefault()

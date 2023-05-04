@@ -10,15 +10,9 @@
 
 ## 세부 구현 사항
 
-- 질환명 검색시 API 호출 통해서 검색어 추천 기능 구현
+<br/><br/>
 
-<br/>
-
-- 검색어가 없을 시 “검색어 없음” 표출
-
-<br/>
-
-- API 호출별로 로컬 캐싱 구현
+## API 호출별로 로컬 캐싱 구현
 
 ```javascript
 const useSearchHandler = (searchKeyword: string) => {
@@ -54,16 +48,13 @@ const useSearchHandler = (searchKeyword: string) => {
 }
 ```
 
-- 캐싱을 어떻게 기술했는가
-
-<br/>
-
 위의 코드를 보면, useDebounce라는 커스텀 훅을 사용하여 입력된 searchKeyword를 디바운스 처리한다. 검색어를 입력할 때마다 매번 API 요청을 보내는 것이 아니라 일정 시간 후에 마지막으로 입력된 검색어를 기반으로 API 요청을 보낸다.
 이때 캐시 저장소를 사용하여 이전에 요청한 검색어의 결과를 저장하고, 동일한 검색어가 입력될 때 API 요청 대신 캐시된 데이터를 사용한다. 캐시 저장소를 사용한 이유는 대규모의 데이터를 다루는 데에 적합하고, 검색 결과와 같이 자주 변경되지 않는 데이터를 캐싱하는데 효과적이기 때문이다.
 
 <br/><br/>
 
-- expire time 구현
+## expire time 구현 (리팩토링)
+
   <br/>
   캐시가 많이 쌓이게 되면 그만큼 캐시 내부에서 데이터를 찾는 시간이 늘어나 오히려 성능 측면에서 좋지 않다. 때문에 캐시된 응답이 5분 동안 유효하도록 하였다.
 
@@ -75,10 +66,10 @@ instance.get(`/?name=${debouncedValue}`, {
 })
 ```
 
-<br/>
-    
-- 입력마다 API 호출하지 않도록 API 호출 횟수를 줄이는 전략 수립 및 실행
-    
+<br/><br/>
+
+## API 호출 횟수 줄이는 전략 수립 및 실행
+
 ```javascript
 export const useDebounce = (value: any, delay = 300) => {
   const [debouncedValue, setDebouncedValue] = useState(value)
@@ -89,20 +80,15 @@ export const useDebounce = (value: any, delay = 300) => {
     return () => clearTimeout(handler)
   })
 
-return debouncedValue
+  return debouncedValue
 }
+```
 
-````
 input 이벤트가 발생할 때마다 타이머를 설정한다. 300ms동안 입력이 없으면 입력이 끝난 것으로 간주한다. 300ms 이전에 타자 입력이 발생하면 이전 타이머는 취소하고 새로운 타이머를 다시 설정한다. useDebounce 훅을 사용하여 value가 변경될 때마다 디바운스를 적용하고 debouncedValue 값을 업데이트한다. 일정 시간 후에 value를 debouncedValue로 업데이트하고, clearTimeout 함수를 사용하여 이전 setTimeout 실행을 취소시킨다.
 
-<br/>
+<br/><br/>
 
-
-- API를 호출할 때 마다 console.info("calling api") 출력을 통해 콘솔창에서 API 호출 횟수 확인이 가능하도록 설정
-
-<br/>
-
-- 키보드만으로 추천 검색어들로 이동 가능하도록 구현
+## 키보드만으로 추천 검색어 이동
 
 ```javascript
 const useKeyHandler = (result: any): any => {
@@ -113,14 +99,20 @@ const useKeyHandler = (result: any): any => {
     switch (key) {
       case 'ArrowUp':
         event.preventDefault()
-        setSelectedIdx((prev: any) => Math.max(prev - 1, -1))
+        setSelectedIdx((prev: any) => {
+          if (prev === -1) {
+            return result.length - 1
+          }
+          return Math.max(prev - 1, 0)
+        })
         break
       case 'ArrowDown':
         event.preventDefault()
         if (selectedIdx === 5) {
           setSelectedIdx(0)
         } else {
-          setSelectedIdx((prev: any) => Math.min(prev + 1, result.length - 1))
+          console.log(result.length - 1)
+          setSelectedIdx((prev: any) => Math.min(prev + 1, result.length))
         }
         break
       case 'Enter':
@@ -136,7 +128,7 @@ const useKeyHandler = (result: any): any => {
 
   return { handleKeyUpDown, selectedIdx }
 }
-````
+```
 
 커스텀 훅 useKeyHandler을 사용하여 키보드의 방향키로 이동 가능하다. selectedIdx는 현재 선택된 항목의 인덱스를 저장하고, 초기값으로 -1을 가진다. handleKeyUpDown 함수는 event 객체를 매개변수로 받아 키보드 이벤트 정보를 추출한다. 각각의 이벤트 조건에 따라 selectedIdx 값을 변화시킨다.
 

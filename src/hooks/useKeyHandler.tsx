@@ -20,7 +20,7 @@ const useKeyHandler = (result: any): any => {
         if (selectedIdx === 5) {
           setSelectedIdx(0)
         } else {
-          setSelectedIdx((prev: any) => Math.min(prev + 1, result.length - 1))
+          setSelectedIdx((prev: any) => Math.min(prev + 1, result.length))
         }
         break
       case 'Enter':

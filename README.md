@@ -41,9 +41,6 @@ export const searchWithCache = async function (
 ): Promise<ResultItem[]> {
   const cache = await caches.open(cacheName)
 
-  // 만료된 cache 삭제
-  await clearExpiredCache(cache)
-
   const cachedResponse = await cache.match(keyword)
   const timestampResponse = await cache.match(`${keyword}_timestamp`)
 
@@ -67,33 +64,6 @@ export const searchWithCache = async function (
   return response.data
 }
 ```
-
-cache 데이터가 timestamp까지 너무 많이 저장되는 것 같아서 요청할 때 전체 캐시 데이터를 검사해서 만료된 캐시 데이터를 삭제하도록 clearExpiredCache 함수를 작성해서 사용했습니다.
-
-```typescript
-const clearExpiredCache = async (cache: Cache): Promise<void> => {
-  const keys = await cache.keys()
-
-  const checkCaches = keys.map(async key => {
-    const keyword = key.url
-    const isExpired = await isCacheExpired(cache, keyword)
-    return isExpired ? keyword : null
-  })
-
-  const expiredCaches = (await Promise.all(checkCaches)).filter(
-    data => data !== null
-  ) as string[]
-
-  const deleteCaches = expiredCaches.map(async key => {
-    await cache.delete(key)
-    await cache.delete(`${key}_timestamp`)
-  })
-
-  await Promise.all(deleteCaches)
-}
-```
-
-만료기간을 60초로 설정했을 때 생각으로 만들었는데 cache 만료기간이 길다면 캐시 개수를 제한하고 초과할 때 가장 오래된 캐시 데이터부터 삭제하는 방법을 사용할 수 있을 것 같습니다.
 
 - 캐시기능을 구현하는데 참고한 링크
   - https://web.dev/cache-api-quick-guide/

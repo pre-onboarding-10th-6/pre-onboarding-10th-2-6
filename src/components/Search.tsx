@@ -6,6 +6,7 @@ import { CACHE_SUGGESTIONS, CACHE_DURATION } from '../constants/cache'
 import useCache from '../hooks/useCache'
 import useDebounce from '../hooks/useDebounce'
 import useInput from '../hooks/useInput'
+import useKeyboardNavigation from '../hooks/useKeyboardNavigation'
 import { Suggestion } from '../types/search'
 
 import SearchBar from './SearchBar'
@@ -47,7 +48,6 @@ const Search = () => {
   })
 
   const [searchBarFocused, setSearchBarFocused] = useState(false)
-  const [focusIndex, setFocusIndex] = useState<number>(-1)
 
   const handleChangeKeyword = (
     e: React.MouseEvent<HTMLLIElement>,
@@ -57,37 +57,10 @@ const Search = () => {
     setKeyword(newKeyword)
   }
 
-  const handleMoveFocus = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!suggestions.length) {
-      return
-    }
-
-    const lastIndex = suggestions.length - 1
-
-    switch (e.key) {
-      case 'ArrowDown': {
-        e.preventDefault()
-        setFocusIndex(prevIndex => (prevIndex < lastIndex ? prevIndex + 1 : 0))
-        break
-      }
-      case 'ArrowUp': {
-        e.preventDefault()
-        setFocusIndex(prevIndex => (prevIndex > 0 ? prevIndex - 1 : lastIndex))
-        break
-      }
-      case 'Escape': {
-        setFocusIndex(-1)
-        break
-      }
-      case 'Enter': {
-        focusIndex > -1 && setKeyword(suggestions[focusIndex].name)
-        break
-      }
-      default: {
-        break
-      }
-    }
-  }
+  const { focusIndex, setFocusIndex, handleMoveFocus } = useKeyboardNavigation(
+    suggestions,
+    setKeyword
+  )
 
   useEffect(() => {
     setFocusIndex(-1)

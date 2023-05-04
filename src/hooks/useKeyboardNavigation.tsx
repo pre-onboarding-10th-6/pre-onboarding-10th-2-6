@@ -1,19 +1,19 @@
 import { useState } from 'react'
 
-import { Suggestion } from '../types/search'
+import { Disease } from '../types/disease'
 
 const useKeyboardNavigation = (
-  suggestions: Suggestion[],
+  diseases: Disease[],
   setKeyword: React.Dispatch<React.SetStateAction<string>>
 ) => {
   const [focusIndex, setFocusIndex] = useState<number>(-1)
 
   const handleMoveFocus = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!suggestions.length) {
+    if (!diseases.length) {
       return
     }
 
-    const lastIndex = suggestions.length - 1
+    const lastIndex = diseases.length - 1
 
     switch (e.key) {
       case 'ArrowDown': {
@@ -31,7 +31,7 @@ const useKeyboardNavigation = (
         break
       }
       case 'Enter': {
-        focusIndex > -1 && setKeyword(suggestions[focusIndex].name)
+        focusIndex > -1 && setKeyword(diseases[focusIndex].name)
         break
       }
       default: {

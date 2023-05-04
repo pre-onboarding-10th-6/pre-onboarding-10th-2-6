@@ -125,6 +125,7 @@ export const useDebounce = (value: string, delay = 500) => {
    - 키보드 방향키 조작만으로 추천 검색어 리스트 사이를 이동
 
 ```typescript
+// src > components > SearchBar.tsx
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!suggestList) {
       return

@@ -5,7 +5,7 @@ import styled from 'styled-components'
 import useScrollToSelected from '../hooks/useScrollToSelected'
 import { Suggestion } from '../types/search'
 
-const SearchSuggestionsLayout = styled.ul`
+const SearchSuggestionsLayout = styled.div`
   position: absolute;
   width: 100%;
   padding: 25px 0;
@@ -18,7 +18,6 @@ const SearchSuggestionsLayout = styled.ul`
     overflow-y: scroll;
     max-height: 200px;
   }
-
   li {
     display: flex;
     align-items: center;

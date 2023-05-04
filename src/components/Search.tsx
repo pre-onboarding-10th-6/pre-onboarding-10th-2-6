@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { getSuggestions } from '../api/search'
+import { getDiseases } from '../api/search'
 import { CACHE_SUGGESTIONS, CACHE_DURATION } from '../constants/cache'
 import useCache from '../hooks/useCache'
 import useDebounce from '../hooks/useDebounce'
 import useInput from '../hooks/useInput'
-import { Suggestion } from '../types/search'
+import useKeyboardNavigation from '../hooks/useKeyboardNavigation'
+import { Disease } from '../types/disease'
 
 import SearchBar from './SearchBar'
 import SearchSuggestions from './SearchSuggestions'
@@ -38,16 +39,15 @@ const Search = () => {
   const { value: keyword, setValue: setKeyword, handleChange } = useInput('')
   const debouncedKeyword = useDebounce<string>(keyword, 250)
 
-  const { cachedData: suggestions } = useCache<Suggestion[]>({
+  const { cachedData: suggestions } = useCache<Disease[]>({
     initialData: [],
     name: CACHE_SUGGESTIONS,
     key: debouncedKeyword,
     duration: CACHE_DURATION,
-    fetchData: getSuggestions
+    fetchData: getDiseases
   })
 
   const [searchBarFocused, setSearchBarFocused] = useState(false)
-  const [focusIndex, setFocusIndex] = useState<number>(-1)
 
   const handleChangeKeyword = (
     e: React.MouseEvent<HTMLLIElement>,
@@ -57,37 +57,10 @@ const Search = () => {
     setKeyword(newKeyword)
   }
 
-  const handleMoveFocus = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!suggestions.length) {
-      return
-    }
-
-    const lastIndex = suggestions.length - 1
-
-    switch (e.key) {
-      case 'ArrowDown': {
-        e.preventDefault()
-        setFocusIndex(prevIndex => (prevIndex < lastIndex ? prevIndex + 1 : 0))
-        break
-      }
-      case 'ArrowUp': {
-        e.preventDefault()
-        setFocusIndex(prevIndex => (prevIndex > 0 ? prevIndex - 1 : lastIndex))
-        break
-      }
-      case 'Escape': {
-        setFocusIndex(-1)
-        break
-      }
-      case 'Enter': {
-        focusIndex > -1 && setKeyword(suggestions[focusIndex].name)
-        break
-      }
-      default: {
-        break
-      }
-    }
-  }
+  const { focusIndex, setFocusIndex, handleMoveFocus } = useKeyboardNavigation(
+    suggestions,
+    setKeyword
+  )
 
   useEffect(() => {
     setFocusIndex(-1)

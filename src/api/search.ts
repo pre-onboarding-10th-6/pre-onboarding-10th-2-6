@@ -1,6 +1,6 @@
-import { Suggestion } from '../types/search'
+import { Disease } from '../types/disease'
 
 import { instance } from '.'
 
-export const getSuggestions = (name: string): Promise<Suggestion[]> =>
+export const getDiseases = (name: string): Promise<Disease[]> =>
   instance.get('api/v1/search-conditions/', { params: { name } })

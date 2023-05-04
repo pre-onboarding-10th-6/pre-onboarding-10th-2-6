@@ -3,7 +3,7 @@ import { BiSearch } from 'react-icons/bi'
 import styled from 'styled-components'
 
 import useScrollToSelected from '../hooks/useScrollToSelected'
-import { Suggestion } from '../types/search'
+import { Disease } from '../types/disease'
 
 const SearchSuggestionsLayout = styled.div`
   position: absolute;
@@ -51,7 +51,7 @@ const SearchSuggestionsLayout = styled.div`
 `
 
 interface SearchSuggestionsProps {
-  suggestions: Suggestion[]
+  suggestions: Disease[]
   focusIndex: number
   handleChangeKeyword: (
     e: React.MouseEvent<HTMLLIElement>,

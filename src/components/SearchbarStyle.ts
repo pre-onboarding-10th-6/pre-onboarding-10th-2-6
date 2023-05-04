@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-export const SearchbarWrapper = styled.div`
+export const SearchBarWrapper = styled.div`
   border-radius: 42px;
   border: 2px solid;
   border-color: #ffffff;

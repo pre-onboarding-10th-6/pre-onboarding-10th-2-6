@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import styled from 'styled-components'
 
-import { ReactComponent as IconSearch } from '../../icons/IconSearch.svg'
+import { ReactComponent as IconSearch } from '../icons/IconSearch.svg'
 
 import SearchList from './SearchList'
 import useSearch from './useSearch'

@@ -1,8 +1,9 @@
 import styled from 'styled-components'
 
-import { ReactComponent as IconSearch } from '../../icons/IconSearch.svg'
-import { SearchState } from '../../types'
-import { getRecentKeywords } from '../../utils/recentKeywords'
+import { ReactComponent as IconSearch } from '../icons/IconSearch.svg'
+import { SearchState } from '../types'
+
+import { getRecentKeywords } from './recentKeywords'
 
 interface Props {
   searchState: SearchState

@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-import Search from './Components/Search/Search'
+import Search from './Search/Search'
 
 function App() {
   return (

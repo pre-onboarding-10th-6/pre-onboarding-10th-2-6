@@ -1,9 +1,10 @@
 import { useState, useRef } from 'react'
 
-import { SEARCH_URL, SEARCH_STORAGE } from '../../api/cache'
-import { fetchData, removeExpiredCache } from '../../api/cache'
-import { RECENT_KEYWORDS, SearchState } from '../../types'
-import { setRecentKeywords } from '../../utils/recentKeywords'
+import { SEARCH_URL, SEARCH_STORAGE } from '../api/cache'
+import { fetchData, removeExpiredCache } from '../api/cache'
+import { RECENT_KEYWORDS, SearchState } from '../types'
+
+import { setRecentKeywords } from './recentKeywords'
 
 const useSearch = () => {
   const [searchState, setSearchState] = useState<SearchState>({
@@ -29,8 +30,10 @@ const useSearch = () => {
     e.preventDefault()
 
     setRecentKeywords(searchState.input)
-    const result = await searchAndGetResult(searchState.input)
-    setSearchState({ ...searchState, result })
+    setSearchState({
+      ...searchState,
+      result: await searchAndGetResult(searchState.input)
+    })
   }
 
   const onChangeHanlder = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,8 +42,10 @@ const useSearch = () => {
     if (debounceRef.current !== null) clearTimeout(debounceRef.current)
 
     debounceRef.current = setTimeout(async () => {
-      const result = await searchAndGetResult(e.target.value)
-      setSearchState({ input: e.target.value, result })
+      setSearchState({
+        input: e.target.value,
+        result: await searchAndGetResult(e.target.value)
+      })
     }, 200)
   }
 
@@ -69,8 +74,10 @@ const useSearch = () => {
           : searchState.result[focusedItem - 1].name
 
       setRecentKeywords(autoSearch)
-      const result = await searchAndGetResult(autoSearch)
-      setSearchState({ result, input: autoSearch })
+      setSearchState({
+        result: await searchAndGetResult(autoSearch),
+        input: autoSearch
+      })
       setFocusedItem(-1)
     }
   }
@@ -91,8 +98,10 @@ const useSearch = () => {
 
     if (search.length > 0) {
       setRecentKeywords(search)
-      const result = await searchAndGetResult(search)
-      setSearchState({ result, input: search })
+      setSearchState({
+        result: await searchAndGetResult(search),
+        input: search
+      })
     }
   }
 

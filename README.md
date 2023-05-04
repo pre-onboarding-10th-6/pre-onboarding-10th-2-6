@@ -153,6 +153,68 @@ const handleSearchbarBlur = (e: React.FocusEvent<HTMLDivElement>) => {
 }
 ```
 
-https://legacy.reactjs.org/docs/events.html#onfocus
+위, 아래, tab, enter의 키보드 이동부분을 useKeyboardNavigation 훅으로 분리해서 구현했습니다.
+
+```typescript
+length: number,
+onClick: (index: number) => void
+```
+
+length로 사용할 배열의 길이를 받아오고 해당 항목을 선택했을 때 호출되는 함수를 인자로 받습니다.
+`const [selectedIndex, setSelectedIndex] = useState(0)`
+selectedIndex 값으로 이벤트마다 값을 변경해주고 있습니다.
+
+```typescript
+const useKeyboardNavigation = (
+  length: number,
+  onClick: (index: number) => void
+) => {
+  const [selectedIndex, setSelectedIndex] = useState(0)
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      switch (e.key) {
+        case 'ArrowUp': {
+          e.preventDefault()
+          if (selectedIndex > 0) {
+            setSelectedIndex(selectedIndex - 1)
+          }
+          break
+        }
+        case 'ArrowDown': {
+          e.preventDefault()
+          if (selectedIndex < length - 1) {
+            setSelectedIndex(selectedIndex + 1)
+          }
+          break
+        }
+        case 'Tab':
+          e.preventDefault()
+          if (selectedIndex < length - 1) {
+            setSelectedIndex(selectedIndex + 1)
+          }
+          break
+        case 'Enter': {
+          onClick(selectedIndex)
+          break
+        }
+        default:
+          break
+      }
+    },
+    [selectedIndex, setSelectedIndex, length, onClick]
+  )
+
+  return { selectedIndex, handleKeyDown }
+}
+
+export default useKeyboardNavigation
+```
 
 ### 삽질한 부분
+
+- section 태그에 onFocus, onBlur를 등록했는데 자식컴포넌트에서 tab으로 이동하는데도 blur이벤트가 발생해서 애먹었는데 target이 자식요소인지 확인하는 조건이 필요했음
+  [https://legacy.reactjs.org/docs/events.html#onfocus]
+
+- 캐쉬만료기간 계산할 때 ms 생각해서 60 \* 1000 처럼 1000을 곱해줬어야 했는데 빼먹고 삽질
+- SearchBar에서 KeywordList으로 방향키나 탭을 누르면 바로 이동하게 구현하는 부분

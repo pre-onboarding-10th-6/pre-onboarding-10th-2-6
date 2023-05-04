@@ -14,6 +14,6 @@ export const searchAPI = (
 ): Promise<AxiosResponse<SEARCH_ITEM[]>> =>
   instance.get(`/?name=${debouncedValue}`, {
     headers: {
-      'Cache-Control': 'max-age=86400'
+      'Cache-Control': 'max-age=300'
     }
   })

@@ -1,51 +1,41 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 
 import { KeywordListProps } from '../types/type'
 
 import { List, ListItem, ListWrapper } from './KeywordListStyle'
 
-const KeywordList: React.FC<KeywordListProps> = ({ results, onClick }) => {
-  const [selectedKeywordIndex, setSelectedKeywordIndex] = useState(0)
+const KeywordList: React.FC<KeywordListProps> = ({
+  results,
+  onClick,
+  onKeyDown,
+  selectedIndex
+}) => {
+  const listRefs = useRef<(HTMLLIElement | null)[]>([])
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLUListElement>) => {
-    switch (e.key) {
-      case 'ArrowUp': {
-        e.preventDefault()
-        if (selectedKeywordIndex > 0) {
-          setSelectedKeywordIndex(selectedKeywordIndex - 1)
-        }
-        break
-      }
-      case 'ArrowDown': {
-        e.preventDefault()
-        if (selectedKeywordIndex < results.length - 1) {
-          setSelectedKeywordIndex(selectedKeywordIndex + 1)
-        }
-        break
-      }
-      case 'Enter': {
-        const selectedKeyword = results[selectedKeywordIndex]?.name || ''
-        onClick(selectedKeyword)
-        break
-      }
-      default:
-        break
-    }
-  }
   const handleClick = (keyword: string) => {
     onClick(keyword)
   }
 
+  useEffect(() => {
+    if (listRefs?.current && listRefs?.current[selectedIndex]) {
+      listRefs?.current[selectedIndex]?.scrollIntoView({
+        block: 'nearest',
+        behavior: 'auto'
+      })
+    }
+  }, [selectedIndex])
+
   return (
     <ListWrapper>
-      <List onKeyDown={handleKeyDown} tabIndex={0}>
+      <List onKeyDown={onKeyDown} tabIndex={0}>
         {results.length == 0 && <p>검색어가 없습니다.</p>}
-        {results.map((result, index) => (
+        {results?.map((result, index) => (
           <ListItem
             key={result.id}
             onClick={() => handleClick(result.name)}
-            selected={selectedKeywordIndex === index}
+            selected={selectedIndex === index}
             tabIndex={-1}
+            ref={el => (listRefs.current[index] = el)}
           >
             {result.name}
           </ListItem>

@@ -6,4 +6,6 @@ export interface ResultItem {
 export interface KeywordListProps {
   results: ResultItem[]
   onClick: (selectedKeyword: string) => void
+  onKeyDown: (e: React.KeyboardEvent<HTMLUListElement>) => void
+  selectedIndex: number
 }

@@ -1,4 +1,6 @@
 # 기업 과제 1 - 검색창+검색어 추천+캐싱 기능
+![](https://velog.velcdn.com/images/ssori0421/post/f605194f-5063-4a7b-be16-ba7744453db6/image.png)
+
 ## 1. 로컬 캐싱 구현
 
 ```typescript

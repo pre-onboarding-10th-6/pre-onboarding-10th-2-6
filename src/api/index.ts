@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios'
 
 const options = {
+  baseURL: 'https://api.clinicaltrialskorea.com/',
   headers: {
     'Content-Type': 'application/json'
   }

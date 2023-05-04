@@ -2,50 +2,63 @@ import { CACHE_DURATION, CACHE_KEY } from '../assets/config'
 import { instance } from '../util/axios'
 import { getExpireDate } from '../util/getExpireDate'
 
-const getDisease = async (str: string) => {
-  const cacheStorage = await caches.open(CACHE_KEY)
+import { IDisease } from './../types/disease'
 
+const isCacheValid = (cachedStorageData: Response) => {
+  const expired = cachedStorageData.headers.get('expire_date')
+
+  if (expired) {
+    const currentDate = new Date()
+    const expiredDate = new Date(expired)
+    const isCached = currentDate <= expiredDate
+    return isCached
+  }
+
+  return false
+}
+
+const fetchDiseaseFromCache = async (cacheStorage: Cache, str: string) => {
   const cachedStorageData = await cacheStorage.match(str)
 
-  if (cachedStorageData) {
-    console.log('cachedStorageData')
-    const expired = cachedStorageData.headers.get('expire_date')
-    const cachedData = cachedStorageData.json()
+  if (cachedStorageData && isCacheValid(cachedStorageData)) {
+    console.log('캐시가 유효함')
+    return cachedStorageData.json()
+  }
 
-    if (expired) {
-      const currentDate = new Date()
-      const expiredDate = new Date(expired)
-      console.log('currentDate <= expiredDate', currentDate <= expiredDate)
-      console.log('currentDate', currentDate)
-      console.log('expiredDate', expiredDate)
-      if (currentDate <= expiredDate) {
-        console.log('캐쉬되어있음', getExpireDate(CACHE_DURATION))
-        cachedStorageData.headers.set(
-          'expire_date',
-          getExpireDate(CACHE_DURATION)
-        )
-        return cachedData
-      } else {
-        console.log('만료되었음')
-        return fetchDisese(str, cacheStorage)
+  return null
+}
+
+const fetchDiseaseFromAPI = async (
+  str: string,
+  cacheStorage: Cache
+): Promise<IDisease[]> => {
+  try {
+    const { data }: { data: IDisease[] } = await instance.get(
+      `search-conditions/?name=${str}`
+    )
+    const cachedData = new Response(JSON.stringify(data), {
+      headers: {
+        expire_date: getExpireDate(CACHE_DURATION)
       }
-    }
-  } else {
-    console.log('캐슁된적 없음')
-    return fetchDisese(str, cacheStorage)
+    })
+    await cacheStorage.put(str, cachedData)
+    return data
+  } catch (error) {
+    console.error('API에서 데이터 가져오는 중 오류 발생:', error)
+    throw error
   }
 }
 
-const fetchDisese = async (str: string, cacheStorage: Cache) => {
-  console.log('api call api 호출함')
-  const { data } = await instance.get(`search-conditions/?name=${str}`)
-  const cachedData = new Response(JSON.stringify(data), {
-    headers: {
-      expire_date: getExpireDate(CACHE_DURATION)
-    }
-  })
-  await cacheStorage.put(str, cachedData)
-  return data
+const getDisease = async (str: string) => {
+  const cacheStorage = await caches.open(CACHE_KEY)
+  const cachedData = await fetchDiseaseFromCache(cacheStorage, str)
+
+  if (cachedData) {
+    return cachedData
+  } else {
+    console.log('캐시 사용 불가능하거나 만료됨')
+    return fetchDiseaseFromAPI(str, cacheStorage)
+  }
 }
 
 export { getDisease }

@@ -10,10 +10,6 @@ interface SearchAPIResponse {
 const searchAPI = (
   keyword: string
 ): Promise<AxiosResponse<SearchAPIResponse[]>> =>
-  instance.get(`/search-conditions/?name=${keyword}`, {
-    headers: {
-      'Cache-Control': 'max-age=86400'
-    }
-  })
+  instance.get(`/search-conditions/?name=${keyword}`)
 
 export default searchAPI

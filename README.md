@@ -65,7 +65,7 @@ const useSearchHandler = (searchKeyword: string) => {
 
 - expire time 구현
   <br/>
-  캐시가 많이 쌓이게 되면 그만큼 캐시 내부에서 데이터를 찾는 시간이 늘어나 오히려 성능 측면에서 좋지 않다. 때문에 캐시된 응답이 1일 동안 유효하도록 하였다.
+  캐시가 많이 쌓이게 되면 그만큼 캐시 내부에서 데이터를 찾는 시간이 늘어나 오히려 성능 측면에서 좋지 않다. 때문에 캐시된 응답이 5분 동안 유효하도록 하였다.
 
 ```javascript
 instance.get(`/?name=${debouncedValue}`, {

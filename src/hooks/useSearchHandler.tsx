@@ -15,6 +15,9 @@ const useSearchHandler = (searchKeyword: string) => {
       setLoading(true)
       const cacheStorage = await caches.open('search')
       const cachedData = await cacheStorage.match(BASE_URL)
+
+      if (debouncedValue === '') return
+
       try {
         if (cachedData) {
           const res = await cachedData.json()

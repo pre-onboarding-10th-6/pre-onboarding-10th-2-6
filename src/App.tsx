@@ -2,6 +2,7 @@ import { debounce } from 'lodash'
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
+import { findCache, saveCache } from './api/cachings'
 import searchAPI from './api/searchAPI'
 import SearchInput from './components/SearchInput'
 import SearchResult from './components/SearchResult'
@@ -19,26 +20,46 @@ const SearchSectionWrapper = styled.div`
   margin: 0 auto;
   padding-top: 100px;
 `
-export interface Data {
+export interface SearchData {
   name: string
   id: number
 }
 
 function App() {
   const [keyword, setKeyword] = useState<string>('')
-  const [results, setResults] = useState<Data[]>([])
+  const [results, setResults] = useState<SearchData[]>([])
 
   const search = async (word: string) => {
-    try {
-      const response = await searchAPI(word)
-      const data = await response.data
-      setResults(data)
-    } catch (e) {
-      console.log(e)
+    if (keyword !== '') {
+      const findResult = await findCache(word)
+      if (findResult) {
+        setResults(findResult)
+      } else {
+        try {
+          const response = await searchAPI(word)
+          const data = response.data
+          if (response && response.status === 200) {
+            setResults(data)
+            await saveCache({ word, data })
+            console.info('calling api')
+          } else {
+            throw new Error(`Unexpected response status ${response?.status}`)
+          }
+        } catch (error) {
+          console.error(error)
+        }
+      }
     }
   }
 
-  const debouncedSearch = debounce(search, 200)
+  // useEffect(() => {
+  //   const InterValId = setInterval(deleteExpiredCaches, 60 * 60 * 1000)
+
+  //   return () => {
+  //     clearInterval(InterValId)
+  //   }
+
+  const debouncedSearch = debounce(search, 500)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const keyword = e.target.value

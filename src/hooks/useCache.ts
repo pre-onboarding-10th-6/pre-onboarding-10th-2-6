@@ -37,27 +37,30 @@ const useCache = <T>({
     }
 
     const checkCache = async () => {
+      const cacheStorage = await caches.open(name)
+      const cache = await cacheStorage.match(key)
       try {
-        const cacheStorage = await caches.open(name)
-        const cache = await cacheStorage.match(key)
-
-        if (!cache) {
+        // console.log(await cache?.clone().json())
+        if (cache?.status !== 200) {
           fetch()
           return
         }
 
-        const expires = cache.headers.get('Expires')
+        const expires = cache?.headers.get('Expires')
 
         if (!expires) {
-          setCachedData(await cache.json())
+          setCachedData(await cache.clone().json())
           return
         }
 
         const expiresDate = new Date(expires)
         const currentDate = new Date()
-        expiresDate <= currentDate ? fetch() : setCachedData(await cache.json())
+        expiresDate <= currentDate
+          ? fetch()
+          : setCachedData(await cache.clone().json())
       } catch (error) {
         console.error(error)
+        await cacheStorage.delete(key)
       }
     }
 

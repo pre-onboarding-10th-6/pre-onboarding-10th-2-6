@@ -60,12 +60,21 @@ function App() {
   //   }
 
   useEffect(() => {
-    const searchWithDebounce = debounce(() => {
-      search(keyword)
-    }, 1500)
-    const timeoutId = searchWithDebounce()
+    let timeoutId: ReturnType<typeof setTimeout>
 
-    return () => clearTimeout(timeoutId)
+    const debounceSearch = debounce(() => {
+      clearTimeout(timeoutId)
+      timeoutId = setTimeout(() => {
+        search(keyword)
+      }, 1000)
+    }, 500)
+
+    debounceSearch()
+
+    return () => {
+      clearTimeout(timeoutId)
+      debounceSearch.cancel()
+    }
   }, [keyword])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

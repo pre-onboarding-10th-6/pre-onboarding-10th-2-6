@@ -28,6 +28,13 @@ const SearchResultItem = styled.li`
   }
 `
 
+const EmptySearchMessage = styled.span`
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: gray;
+  margin-left: 20px;
+`
+
 interface SearchResultProps {
   results: SearchData[]
 }
@@ -41,7 +48,7 @@ const SearchResult = ({ results }: SearchResultProps) => {
           <SearchResultItem key={result.id}>{result.name}</SearchResultItem>
         ))
       ) : (
-        <div>검색어 없음</div>
+        <EmptySearchMessage>검색어 없음</EmptySearchMessage>
       )}
     </SearchResultWrapper>
   )

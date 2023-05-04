@@ -55,6 +55,7 @@ const Search = () => {
 }
 
 const Form = styled.form`
+  max-width: 1024px;
   width: 80%;
   display: flex;
   flex-direction: column;

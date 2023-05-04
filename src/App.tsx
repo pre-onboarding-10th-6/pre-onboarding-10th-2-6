@@ -59,12 +59,18 @@ function App() {
   //     clearInterval(InterValId)
   //   }
 
-  const debouncedSearch = debounce(search, 500)
+  useEffect(() => {
+    const searchWithDebounce = debounce(() => {
+      search(keyword)
+    }, 1500)
+    const timeoutId = searchWithDebounce()
+
+    return () => clearTimeout(timeoutId)
+  }, [keyword])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const keyword = e.target.value
     setKeyword(keyword)
-    debouncedSearch(keyword)
   }
 
   return (

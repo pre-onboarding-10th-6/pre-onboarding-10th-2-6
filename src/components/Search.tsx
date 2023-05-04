@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { getSuggestions } from '../api/search'
+import { getDiseases } from '../api/search'
 import { CACHE_SUGGESTIONS, CACHE_DURATION } from '../constants/cache'
 import useCache from '../hooks/useCache'
 import useDebounce from '../hooks/useDebounce'
 import useInput from '../hooks/useInput'
-import { Suggestion } from '../types/search'
+import { Disease } from '../types/disease'
 
 import SearchBar from './SearchBar'
 import SearchSuggestions from './SearchSuggestions'
@@ -38,12 +38,12 @@ const Search = () => {
   const { value: keyword, setValue: setKeyword, handleChange } = useInput('')
   const debouncedKeyword = useDebounce<string>(keyword, 250)
 
-  const { cachedData: suggestions } = useCache<Suggestion[]>({
+  const { cachedData: suggestions } = useCache<Disease[]>({
     initialData: [],
     name: CACHE_SUGGESTIONS,
     key: debouncedKeyword,
     duration: CACHE_DURATION,
-    fetchData: getSuggestions
+    fetchData: getDiseases
   })
 
   const [searchBarFocused, setSearchBarFocused] = useState(false)

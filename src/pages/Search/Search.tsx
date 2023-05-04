@@ -23,6 +23,7 @@ function Search() {
     searchResults.length,
     index => {
       const selectedKeyword = searchResults[index]?.name || ''
+      setIsSearchbarFocused(false)
       setKeyword(selectedKeyword)
     }
   )
@@ -51,9 +52,8 @@ function Search() {
   }
 
   const handleSearchbarKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (searchResults.length > 0) {
+    if (searchResults.length > 0 && !isSearchbarFocused) {
       e.preventDefault()
-      setIsSearchbarFocused(true)
       handleKeyDown(e as unknown as React.KeyboardEvent<HTMLUListElement>)
     }
   }

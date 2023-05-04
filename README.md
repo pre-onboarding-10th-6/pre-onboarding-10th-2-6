@@ -18,9 +18,9 @@ export const getExpireDate = (cacheTime: number) => {
 }
 ```
 #### 'getExpireDate()'
-- 1. 현재 날짜와 시간을 나타내는 currentDate 객체를 생성. 
-- 2. currentDate.getTime() 메서드를 사용해 현재 날짜와 시간을 밀리초로 변환한 후, cacheTime을 더하고 새로운 Date 객체를 생성. 
-- 3. expirationDate.toUTCString() 메서드를 사용해 만료 시간를 UTC 문자열로 변환해 반환. 
+  1. 현재 날짜와 시간을 나타내는 currentDate 객체를 생성. 
+  2. currentDate.getTime() 메서드를 사용해 현재 날짜와 시간을 밀리초로 변환한 후, cacheTime을 더하고 새로운 Date 객체를 생성. 
+  3. expirationDate.toUTCString() 메서드를 사용해 만료 시간를 UTC 문자열로 변환해 반환. 
 
 ```typescript
 // src > service > getDisease.tsx
@@ -77,21 +77,21 @@ const getDisease = async (str: string) => {
 }
 ```
 #### 'fetchDiseaseFromAPI()'
-- 1. instance.get() 메서드를 사용해 주어진 질병 이름에 해당하는 데이터를 API에서 가져와서 data 변수에 저장.
-- 2. 가져온 데이터를 JSON 문자열로 변환한 후, 새로운 Response 객체를 생성하고 만료 날짜를 헤더에 설정함. getExpireDate 함수를 사용하여 만료 시간 계산.
-- 3. cacheStorage.put() 메서드를 사용하여 질병 이름(str)을 키로 하여 캐시 데이터를 저장.
+  1. instance.get() 메서드를 사용해 주어진 질병 이름에 해당하는 데이터를 API에서 가져와서 data 변수에 저장.
+  2. 가져온 데이터를 JSON 문자열로 변환한 후, 새로운 Response 객체를 생성하고 만료 날짜를 헤더에 설정함. getExpireDate 함수를 사용하여 만료 시간 계산.
+  3. cacheStorage.put() 메서드를 사용하여 질병 이름(str)을 키로 하여 캐시 데이터를 저장.
 
 #### 'getDisease()'
-- 1. caches.open() 메서드를 사용하여 주어진 캐시 키(CACHE_KEY)에 대한 캐시 스토리지를 열어서, 이를 cacheStorage 변수에 저장.
-- 2. fetchDiseaseFromCache() 함수를 호출해 캐시 스토리지에서 주어진 질병 이름(str)에 해당하는 데이터를 가져옴. 가져온 데이터를 cachedData 변수에 저장.
-- 3. 캐시된 데이터가 존재하면 캐시된 데이터를 반환.
-- 4. 캐시된 데이터가 없거나 유효하지 않은 경우, fetchDiseaseFromAPI() 함수를 호출하여 API에서 주어진 질병 이름(str)에 해당하는 데이터를 가져와서 데이터를 반환.
+  1. caches.open() 메서드를 사용하여 주어진 캐시 키(CACHE_KEY)에 대한 캐시 스토리지를 열어서, 이를 cacheStorage 변수에 저장.
+  2. fetchDiseaseFromCache() 함수를 호출해 캐시 스토리지에서 주어진 질병 이름(str)에 해당하는 데이터를 가져옴. 가져온 데이터를 cachedData 변수에 저장.
+  3. 캐시된 데이터가 존재하면 캐시된 데이터를 반환.
+  4. 캐시된 데이터가 없거나 유효하지 않은 경우, fetchDiseaseFromAPI() 함수를 호출하여 API에서 주어진 질병 이름(str)에 해당하는 데이터를 가져와서 데이터를 반환.
 
 
 
 ## 2. Event 최적화
-- 키보드 입력마다 API가 호출되는 것을 방지하기 위해 debounce 적용
-- 'useDebounce()' 커스텀 훅 사용
+  키보드 입력마다 API가 호출되는 것을 방지하기 위해 debounce 적용
+  'useDebounce()' 커스텀 훅 사용
 
 ```typescript
 // src > hooks > useDebounce.ts
@@ -110,9 +110,9 @@ export const useDebounce = (value: string, delay = 500) => {
 }
 ```
 #### 'useDebounce()' 커스텀 훅
-- 1. debounceValue 라는 state 생성.
-- 2. useEffect hook을 사용하여 state가 변경될 때마다 debounce 처리를 수행함. 이때, delay 기본값을 0.5초로 설정.
-- 3. clearTimeout() 메서드를 사용해 0.5초가 지나기 전에 설정된 setTimeout()은 취소함.
+  1. debounceValue 라는 state 생성.
+  2. useEffect hook을 사용하여 state가 변경될 때마다 debounce 처리를 수행함. 이때, delay 기본값을 0.5초로 설정.
+  3. clearTimeout() 메서드를 사용해 0.5초가 지나기 전에 설정된 setTimeout()은 취소함.
 
 ## 3-1. UX
    - 키보드 방향키 조작만으로 추천 검색어 리스트 사이를 이동
@@ -132,20 +132,12 @@ export const useDebounce = (value: string, delay = 500) => {
   }
 ```
 #### 'handleKeyDown()'
-- 1. suggestList가 없는 경우 바로 return 함으로써 추천 목록이 없을 때는 키 이벤트를 무시함.
-- 2. 위쪽 화살표 키가 눌린 경우, selectedIdx 값을 하나 감소시키되, 최소값은 -1(검색창 위치)로 설정함. setSelectedIdx 함수를 사용하여 선택된 인덱스를 업데이트.
-- 3. 아래쪽 화살표 키가 눌린 경우, selectedIdx 값을 하나 증가시키되, 최대값은 suggestList.length - 1(추천 검색어 리스트 하단부)로 설정함. setSelectedIdx 함수를 사용하여 선택된 인덱스를 업데이트합.
-
-
-
-
-
-
-
-
+  1. suggestList가 없는 경우 바로 return 함으로써 추천 목록이 없을 때는 키 이벤트를 무시함.
+  2. 위쪽 화살표 키가 눌린 경우, selectedIdx 값을 하나 감소시키되, 최소값은 -1(검색창 위치)로 설정함. setSelectedIdx 함수를 사용하여 선택된 인덱스를 업데이트.
+  3. 아래쪽 화살표 키가 눌린 경우, selectedIdx 값을 하나 증가시키되, 최대값은 suggestList.length - 1(추천 검색어 리스트 하단부)로 설정함. setSelectedIdx 함수를 사용하여 선택된 인덱스를 업데이트합.
 
 ## 3-2. UX
-   -  추천 검색어 리스트에서 선택된 항목이 목록 컨테이너의 경계를 벗어날 경우 스크롤 위치를 조절하여 선택된 항목이 항상 보이도록 함
+  -  추천 검색어 리스트에서 선택된 항목이 목록 컨테이너의 경계를 벗어날 경우 스크롤 위치를 조절하여 선택된 항목이 항상 보이도록 함
   - 'useScrollToSelected()' 커스텀 훅 사용
 
 ```typescript
@@ -179,9 +171,9 @@ export const useScrollToSelected = (selectedIdx: number) => {
 }
 ```
 #### 'useScrollToSelected()'
-- 1. scrollListRef라는 이름의 useRef hook을 사용하여 HTMLUListElement 타입의 참조를 생성.
-- 2. useEffect hook을 사용하여 선택된 인덱스(selectedIdx)가 변경될 때마다 스크롤 처리를 수행.
-- 3. useEffect 내부에서, scrollListRef.current가 존재하고 selectedIdx가 -1(검색창 위치)이 아닌 경우에만 스크롤 처리를 수행.
-- 4. getBoundingClientRect() 메서드를 사용해 선택된 항목(selectedEl)과 목록 컨테이너(scrollListRef.current)의 크기(위치) 정보를 가져옴.
-- 5. 선택된 항목이 목록 컨테이너의 아래쪽 경계를 벗어난 경우, 목록 컨테이너의 스크롤 위치를 아래로 이동시키고, 선택된 항목이 목록 컨테이너의 위쪽 경계를 벗어난 경우, 목록 컨테이너의 스크롤 위치를 위로 이동시킴.
-- 6. scrollListRef.current가 존재하지만 selectedIdx가 -1인 경우, 목록 컨테이너의 스크롤 위치를 맨 위로 이동시킵니다.
+  1. scrollListRef라는 이름의 useRef hook을 사용하여 HTMLUListElement 타입의 참조를 생성.
+  2. useEffect hook을 사용하여 선택된 인덱스(selectedIdx)가 변경될 때마다 스크롤 처리를 수행.
+  3. useEffect 내부에서, scrollListRef.current가 존재하고 selectedIdx가 -1(검색창 위치)이 아닌 경우에만 스크롤 처리를 수행.
+  4. getBoundingClientRect() 메서드를 사용해 선택된 항목(selectedEl)과 목록 컨테이너(scrollListRef.current)의 크기(위치) 정보를 가져옴.
+  5. 선택된 항목이 목록 컨테이너의 아래쪽 경계를 벗어난 경우, 목록 컨테이너의 스크롤 위치를 아래로 이동시키고, 선택된 항목이 목록 컨테이너의 위쪽 경계를 벗어난 경우, 목록 컨테이너의 스크롤 위치를 위로 이동시킴.
+  6. scrollListRef.current가 존재하지만 selectedIdx가 -1인 경우, 목록 컨테이너의 스크롤 위치를 맨 위로 이동시킵니다.

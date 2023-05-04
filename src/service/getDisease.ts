@@ -10,10 +10,8 @@ const isCacheValid = (cachedStorageData: Response) => {
   if (expired) {
     const currentDate = new Date()
     const expiredDate = new Date(expired)
-    const isCached = currentDate <= expiredDate
-    return isCached
+    return currentDate <= expiredDate
   }
-
   return false
 }
 
@@ -41,6 +39,7 @@ const fetchDiseaseFromAPI = async (
       }
     })
     await cacheStorage.put(str, cachedData)
+    console.info('calling api')
     return data
   } catch (error) {
     throw error

@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { BiSearch } from 'react-icons/bi'
 import styled from 'styled-components'
 
+import { color } from './assets/colors'
+import SearchBar from './components/SearchBar'
 import SuggestSearchList from './components/SuggestSearchList'
 import useDebounce from './hooks/useDebounce'
 import { getDisease } from './service/getDisease'
@@ -13,19 +14,6 @@ function App() {
   const [selectedIdx, setSelectedIdx] = useState<number>(-1)
 
   const debounceInput = useDebounce(searchInput)
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!suggestList) {
-      return
-    }
-    if (e.key === 'ArrowUp') {
-      const arrowUpIndex = Math.max(selectedIdx - 1, -1)
-      setSelectedIdx(arrowUpIndex)
-    } else if (e.key === 'ArrowDown') {
-      const arrowDownIndex = Math.min(selectedIdx + 1, suggestList.length - 1)
-      setSelectedIdx(arrowDownIndex)
-    }
-  }
 
   const getDiseaseList = useCallback(async () => {
     if (debounceInput === '') {
@@ -46,11 +34,6 @@ function App() {
     getDiseaseList()
   }, [getDiseaseList])
 
-  const onChangeSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target
-    setSearchInput(value)
-  }
-
   return (
     <StLayout>
       <StSearchContainer>
@@ -58,20 +41,12 @@ function App() {
           국내 모든 임상시험 검색하고
           <br /> 온라인으로 참여하기
         </StTitle>
-        <StInputContainer>
-          <StInputWrap>
-            <BiSearch size={20} />
-            <input
-              type="text"
-              onChange={onChangeSearchInput}
-              onKeyDown={handleKeyDown}
-              placeholder="질환명을 입력해 주세요."
-            />
-          </StInputWrap>
-          <button>
-            <BiSearch size={20} />
-          </button>
-        </StInputContainer>
+        <SearchBar
+          suggestList={suggestList}
+          setSearchInput={setSearchInput}
+          selectedIdx={selectedIdx}
+          setSelectedIdx={setSelectedIdx}
+        />
         {suggestList && (
           <SuggestSearchList
             suggestList={suggestList}
@@ -90,7 +65,7 @@ const StLayout = styled.div`
   display: flex;
   justify-content: center;
   text-align: center;
-  background-color: #cae9ff;
+  background-color: ${color.BACKGROUND};
 `
 
 const StSearchContainer = styled.div`
@@ -108,8 +83,8 @@ const StInputContainer = styled.div`
   align-items: center;
   position: relative;
 
-  background-color: white;
-  border: 1px solid lightgray;
+  background-color: ${color.WHITE};
+  border: 1px solid ${color.LIGHT_GRAY};
   border-radius: 30px;
   padding: 10px;
   margin-bottom: 8px;
@@ -119,8 +94,8 @@ const StInputContainer = styled.div`
     align-items: center;
     justify-content: center;
     padding: 8px;
-    color: white;
-    background-color: #007be9;
+    color: ${color.WHITE};
+    background-color: ${color.BUTTON};
     border-radius: 100%;
   }
 `

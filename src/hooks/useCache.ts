@@ -67,7 +67,7 @@ const useCache = <T>({
     key ? checkCache() : setCachedData(initialData)
   }, [key])
 
-  return { cachedData }
+  return cachedData
 }
 
 export default useCache

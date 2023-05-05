@@ -39,7 +39,7 @@ const Search = () => {
   const { value: keyword, setValue: setKeyword, handleChange } = useInput('')
   const debouncedKeyword = useDebounce<string>(keyword, 250)
 
-  const { cachedData: suggestions } = useCache<Disease[]>({
+  const suggestions = useCache<Disease[]>({
     initialData: [],
     name: CACHE_SUGGESTIONS,
     key: debouncedKeyword,

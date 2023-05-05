@@ -46,7 +46,7 @@ const SearchSuggestionsLayout = styled.div`
   }
 
   .empty {
-    padding: 0 0 0 25px;
+    padding: 10px 0 0 25px;
   }
 `
 

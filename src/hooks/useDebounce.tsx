@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 
-const useDebouncer = <T,>(value: T, delay: number): T => {
-  const [debouncedValue, setDebouncedValue] = useState(value)
+const useDebouncer = (value: string, delay: number) => {
+  const [debouncedValue, setDebouncedValue] = useState((value = ''))
 
   useEffect(() => {
     const timerId = setTimeout(() => {
@@ -17,3 +17,7 @@ const useDebouncer = <T,>(value: T, delay: number): T => {
 }
 
 export default useDebouncer
+
+// const onChangeHanlder = async (e: React.ChangeEvent<HTMLInputElement>) => {
+//   setSearchState({ ...searchState, input: e.target.value })
+// }

@@ -1,30 +1,49 @@
 import { useState } from 'react'
 import styled from 'styled-components'
 
+import useCache from '../hooks/useCache'
+import useDebouncer from '../hooks/useDebounce'
+import useKeyboard from '../hooks/useKeyboard'
 import { ReactComponent as IconSearch } from '../icons/IconSearch.svg'
 
+import { getRecentKeywords, setRecentKeywords } from './recentKeywords'
 import SearchList from './SearchList'
-import useSearch from './useSearch'
 
 const Search = () => {
-  const {
-    onSubmitHandler,
-    onChangeHanlder,
-    onKeyDownHandler,
-    searchState,
-    focusedItem,
-    searchItemCnt,
-    onMouseDownHandler
-  } = useSearch()
-
   const [isFocus, setIsFocus] = useState(false)
+  const [searchInput, setSearchInput] = useState('')
+  const debouncedInput = useDebouncer(searchInput, 200)
+  const { cachedData, removeExpiredCache, fetchData } = useCache({
+    cacheStorageName: 'search',
+    searchInput: debouncedInput
+  })
+  const { focusIndex, searchItemCnt, onKeyDownHandler } = useKeyboard(
+    async () => {
+      console.log(`enter passing : ${cachedData} ${debouncedInput}`)
+      const autoSearch =
+        debouncedInput.length === 0
+          ? getRecentKeywords()[focusIndex]
+          : cachedData[focusIndex - 1].name
+      setRecentKeywords(autoSearch)
+      setSearchInput(autoSearch)
+    }
+  )
+
+  const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setRecentKeywords(debouncedInput)
+    await removeExpiredCache('search')
+    await fetchData('search', searchInput)
+  }
+
+  const onChangeHanlder = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchInput(e.target.value)
+  }
 
   return (
     <Form
       onSubmit={e =>
-        searchState.input === ''
-          ? alert('값을 입력해주세요')
-          : onSubmitHandler(e)
+        searchInput === '' ? alert('값을 입력해주세요') : onSubmitHandler(e)
       }
       onBlur={() => setIsFocus(false)}
       onFocus={() => setIsFocus(true)}
@@ -32,7 +51,7 @@ const Search = () => {
       <SearchBox>
         <input
           type="search"
-          value={searchState.input}
+          value={searchInput}
           onChange={onChangeHanlder}
           onKeyDown={onKeyDownHandler}
           placeholder="질환명을 입력해 주세요."
@@ -44,10 +63,10 @@ const Search = () => {
 
       {isFocus && (
         <SearchList
-          searchState={searchState}
-          focusedItem={focusedItem}
+          debouncedInput={debouncedInput}
+          cachedData={cachedData ? cachedData : []}
+          focusedItem={focusIndex}
           searchItemCnt={searchItemCnt}
-          onMouseDownHandler={onMouseDownHandler}
         />
       )}
     </Form>

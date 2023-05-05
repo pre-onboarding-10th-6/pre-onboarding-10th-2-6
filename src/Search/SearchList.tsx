@@ -1,17 +1,15 @@
 import styled from 'styled-components'
 
 import { ReactComponent as IconSearch } from '../icons/IconSearch.svg'
-import { SearchState } from '../types'
+import { SearchData } from '../types'
 
-import { getRecentKeywords } from './recentKeywords'
+import { getRecentKeywords, setRecentKeywords } from './recentKeywords'
 
 interface Props {
-  searchState: SearchState
+  debouncedInput: string
+  cachedData: SearchData[]
   focusedItem: number
   searchItemCnt: React.MutableRefObject<HTMLUListElement | null>
-  onMouseDownHandler: (
-    e: React.MouseEvent<HTMLLIElement, MouseEvent>
-  ) => Promise<void>
 }
 
 interface ItemProps {
@@ -20,12 +18,36 @@ interface ItemProps {
 }
 
 const SearchList = ({
-  searchState,
+  debouncedInput,
   focusedItem,
   searchItemCnt,
-  onMouseDownHandler
+  cachedData
 }: Props) => {
   const recentKeywords = getRecentKeywords()
+
+  const onMouseDownHandler = async (
+    event: React.MouseEvent<HTMLLIElement, MouseEvent>
+  ) => {
+    const { currentTarget } = event
+    const titleElement = currentTarget.childNodes[1] as HTMLElement
+    const subtitleElement = currentTarget.childNodes[2] as
+      | HTMLElement
+      | undefined
+
+    const title = titleElement?.textContent?.trim() ?? ''
+    const subTitle = subtitleElement?.textContent?.trim() ?? ''
+
+    const search = `${title} ${subTitle}`.trim()
+
+    if (search.length > 0) {
+      setRecentKeywords(search)
+      // fetch하고 그 결과를 debouncedInput, cachedData에 반영해야함
+      // setSearchState({
+      //   result: await searchAndGetResult(search),
+      //   input: search
+      // })
+    }
+  }
 
   const SearchResultItem = ({ children, classStatement }: ItemProps) => {
     return (
@@ -36,47 +58,39 @@ const SearchList = ({
     )
   }
 
-  const RecentKeyword = () => {
-    return (
-      <>
-        <Text>최근 검색어</Text>
-        {recentKeywords?.map((keyword: string, idx: number) => (
-          <SearchResultItem
-            key={idx}
-            classStatement={focusedItem === idx ? 'focused' : ''}
-          >
-            {keyword}
-          </SearchResultItem>
-        ))}
-      </>
-    )
-  }
-
-  const SearchResult = () => {
-    return searchState.result.length === 0 ? (
-      <p>검색 결과가 없습니다.</p>
-    ) : (
-      <>
-        <SearchResultItem classStatement={focusedItem === 0 ? 'focused' : ''}>
-          <Bold>{searchState.input}</Bold>
-        </SearchResultItem>
-        <Text>추천 검색어</Text>
-        {searchState.result.slice(0, 7).map((arr, idx: number) => (
-          <SearchResultItem
-            key={arr.id}
-            classStatement={focusedItem === idx + 1 ? 'focused' : ''}
-          >
-            <Bold>{searchState.input}</Bold>
-            {arr.name.split(searchState.input)[1]}
-          </SearchResultItem>
-        ))}
-      </>
-    )
-  }
-
   return (
     <List ref={searchItemCnt}>
-      {searchState.input.length === 0 ? <RecentKeyword /> : <SearchResult />}
+      {debouncedInput.length === 0 ? (
+        <>
+          <Text>최근 검색어</Text>
+          {recentKeywords?.map((keyword: string, idx: number) => (
+            <SearchResultItem
+              key={idx}
+              classStatement={focusedItem === idx ? 'focused' : ''}
+            >
+              {keyword}
+            </SearchResultItem>
+          ))}
+        </>
+      ) : cachedData.length === 0 ? (
+        <p>검색 결과가 없습니다.</p>
+      ) : (
+        <>
+          <SearchResultItem classStatement={focusedItem === 0 ? 'focused' : ''}>
+            <Bold>{debouncedInput}</Bold>
+          </SearchResultItem>
+          <Text>추천 검색어</Text>
+          {cachedData.slice(0, 7).map((arr, idx: number) => (
+            <SearchResultItem
+              key={arr.id}
+              classStatement={focusedItem === idx + 1 ? 'focused' : ''}
+            >
+              <Bold>{debouncedInput}</Bold>
+              {arr.name.split(debouncedInput)[1]}
+            </SearchResultItem>
+          ))}
+        </>
+      )}
     </List>
   )
 }

@@ -1,7 +1,8 @@
-import { GrSearch } from 'react-icons/gr'
+import { useState } from 'react'
+import { BiSearch } from 'react-icons/bi'
 import styled from 'styled-components'
 
-import { Input } from '../../components/Input'
+import SearchBar from '../../components/SearchBar'
 import useInputs from '../../hooks/useInputs'
 import useKeyHandler from '../../hooks/useKeyHandler'
 import useSearchHandler from '../../hooks/useSearchHandler'
@@ -14,13 +15,14 @@ const Search = () => {
   } = useInputs({ searchKeyword: '' })
   const { result, loading } = useSearchHandler(searchKeyword)
   const { handleKeyUpDown, selectedIdx } = useKeyHandler(result)
+  const [searchFocused, setSearchFocused] = useState(false)
 
   const validSearchKeyword = () =>
     Array.isArray(result) &&
     result.slice(0, 6).map((item: SEARCH_ITEM, idx) => (
       <Item key={item.id} tabIndex={0} isSelected={idx === selectedIdx}>
         <SearchItem>
-          <GrSearch className="search-icon" style={{ marginRight: '8px' }} />
+          <BiSearch className="search-icon" style={{ marginRight: '8px' }} />
           {item.name}
         </SearchItem>
       </Item>
@@ -36,32 +38,24 @@ const Search = () => {
         온라인으로 참여하기
       </Head>
       <SearchWrap>
-        <SearchInput>
-          <Input
-            id="searchInput"
-            type="text"
-            name="searchKeyword"
-            placeholder="질환명을 입력해주세요."
-            value={searchKeyword}
-            onChange={handleChange}
-            onKeyDown={handleKeyUpDown}
-          >
-            {loading ? (
-              <Text>검색중...</Text>
-            ) : (
-              <>
-                {result.length === 0
-                  ? invalidSearchKeyword()
-                  : validSearchKeyword()}
-              </>
-            )}
-          </Input>
-          <SearchIcon>
-            <>
-              <GrSearch className="search-icon" />
-            </>
-          </SearchIcon>
-        </SearchInput>
+        <SearchBar
+          searchKeyword={searchKeyword}
+          isFocused={searchFocused}
+          handleChange={handleChange}
+          handleKeyUpDown={handleKeyUpDown}
+          handleFocus={() => setSearchFocused(true)}
+          handleBlur={() => setSearchFocused(false)}
+        />
+
+        {loading ? (
+          <Text>검색중...</Text>
+        ) : (
+          <>
+            {result.length === 0
+              ? invalidSearchKeyword()
+              : validSearchKeyword()}
+          </>
+        )}
       </SearchWrap>
     </Main>
   )
@@ -85,33 +79,10 @@ const Head = styled.h1`
 `
 
 const SearchWrap = styled.div`
-  width: 100%;
+  width: 490px;
   margin: 0 auto;
-`
-
-const SearchInput = styled.div`
-  display: flex;
   position: relative;
-  width: 400px;
-  margin: 0 auto;
 `
-
-const SearchIcon = styled.button`
-  position: absolute;
-  right: -10px;
-  margin: 8px 0;
-  padding: 6px 10px;
-  background: #007be9;
-  font-size: 26px;
-  border-radius: 50%;
-  cursor: pointer;
-  z-index: 99;
-
-  path {
-    stroke: #fff;
-  }
-`
-
 const Item = styled.div<{ isSelected: boolean }>`
   margin-bottom: 16px;
   padding: 12px 18px;

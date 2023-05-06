@@ -7,38 +7,48 @@ interface SearchContentsProp {
   result: SEARCH_ITEM[]
   loading: boolean
   selectedIdx: number
+  searchKeyword?: string
+  handleChangeKeyword: (
+    e: React.MouseEvent<HTMLLIElement>,
+    newKeyword: string
+  ) => void
 }
-
-const validSearchKeyword = ({ result, selectedIdx }: SearchContentsProp) =>
-  Array.isArray(result) &&
-  result.slice(0, 6).map((item: SEARCH_ITEM, idx) => (
-    <Item key={item.id} tabIndex={0} isSelected={idx === selectedIdx}>
-      <SearchItem>
-        <BiSearch className="search-icon" style={{ marginRight: '8px' }} />
-        {item.name}
-      </SearchItem>
-    </Item>
-  ))
-
-const invalidSearchKeyword = () => <Text>검색어 없음</Text>
 
 const SearchContents = ({
   result,
-  loading,
-  selectedIdx
+  selectedIdx,
+  handleChangeKeyword,
+  searchKeyword
 }: SearchContentsProp) => {
+  if (!searchKeyword) {
+    return (
+      <SearchContentsLayout>
+        <p className="recommend">추천 검색어</p>
+        <Text>검색어 없음</Text>
+      </SearchContentsLayout>
+    )
+  }
   return (
     <SearchContentsLayout>
       <p className="recommend">추천 검색어</p>
-      <>
-        {result.length === 0
-          ? invalidSearchKeyword()
-          : validSearchKeyword({
-              result,
-              selectedIdx,
-              loading
-            })}
-      </>
+      <ul>
+        {result.length ? (
+          result.slice(0, 6).map(({ id, name }, index) => (
+            <Item
+              key={id}
+              isSelected={index === selectedIdx}
+              onMouseDown={e => handleChangeKeyword(e, name)}
+            >
+              <SearchItem>
+                <BiSearch className="search-icon" />
+                {name}
+              </SearchItem>
+            </Item>
+          ))
+        ) : (
+          <Text>검색어 없음</Text>
+        )}
+      </ul>
     </SearchContentsLayout>
   )
 }
@@ -63,7 +73,7 @@ const SearchContentsLayout = styled.div`
   }
 `
 
-const Item = styled.div<{ isSelected: boolean }>`
+const Item = styled.li<{ isSelected: boolean }>`
   margin-bottom: 16px;
   padding: 12px 18px;
   background-color: ${({ isSelected }) => (isSelected ? '#f5f5f5' : '#fff')};
@@ -76,6 +86,10 @@ const Item = styled.div<{ isSelected: boolean }>`
 const SearchItem = styled.div`
   display: flex;
   align-item: center;
+
+  .search-icon {
+    margin-right: 8px;
+  }
 `
 
 const Text = styled.div`

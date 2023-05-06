@@ -1,18 +1,29 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import styled from 'styled-components'
 
 import SearchBar from '../../components/SearchBar'
 import SearchContents from '../../components/SearchContents'
-import { useDebounce } from '../../hooks/useDebounce'
 import useInputs from '../../hooks/useInputs'
 import useKeyHandler from '../../hooks/useKeyHandler'
 import useSearchHandler from '../../hooks/useSearchHandler'
 
 const Search = () => {
-  const { values, handleChange } = useInputs('')
+  const { values, handleChange, setValues } = useInputs('')
   const { result, loading, debouncedValue } = useSearchHandler(values)
-  const { handleKeyUpDown, selectedIdx } = useKeyHandler(result, debouncedValue)
+  const { handleKeyUpDown, selectedIdx } = useKeyHandler(
+    result,
+    debouncedValue,
+    setValues
+  )
   const [searchFocused, setSearchFocused] = useState(false)
+
+  const handleChangeKeyword = (
+    e: React.MouseEvent<HTMLLIElement>,
+    newKeyword: string
+  ) => {
+    e.preventDefault()
+    setValues(newKeyword)
+  }
 
   return (
     <Main>
@@ -35,6 +46,8 @@ const Search = () => {
             result={result}
             loading={loading}
             selectedIdx={selectedIdx}
+            searchKeyword={values}
+            handleChangeKeyword={handleChangeKeyword}
           />
         )}
       </SearchWrap>

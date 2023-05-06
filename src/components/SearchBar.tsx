@@ -69,6 +69,7 @@ const SearchBarContainer = styled.form<{ isFocused: boolean }>`
     border-radius: 50%;
     background: #007be9;
     color: #fff;
+    cursor: pointer;
   }
 
   .search-icon {

@@ -2,34 +2,28 @@ import { useEffect, useState } from 'react'
 
 import { SEARCH_ITEM } from '../types'
 
-const useKeyHandler = (result: SEARCH_ITEM[], debouncedValue: string) => {
+const useKeyHandler = (
+  result: SEARCH_ITEM[],
+  debouncedValue: string,
+  setValues: React.Dispatch<React.SetStateAction<string>>
+) => {
   const [selectedIdx, setSelectedIdx] = useState(-1)
-  const handleKeyUpDown: any = (event: React.KeyboardEvent) => {
-    const { key } = event
+  const handleKeyUpDown = (e: React.KeyboardEvent) => {
+    if (!result.length) return
 
-    switch (key) {
+    const lastIndex = result.length - 1
+
+    switch (e.key) {
       case 'ArrowUp':
-        event.preventDefault()
-        setSelectedIdx((prev: any) => {
-          if (prev === -1) {
-            return result.length - 1
-          }
-          return Math.max(prev - 1, 0)
-        })
+        e.preventDefault()
+        setSelectedIdx(prevIndex => (prevIndex > 0 ? prevIndex - 1 : lastIndex))
         break
       case 'ArrowDown':
-        event.preventDefault()
-        if (selectedIdx === 5) {
-          setSelectedIdx(0)
-        } else {
-          setSelectedIdx((prev: any) => Math.min(prev + 1, result.length))
-        }
+        e.preventDefault()
+        setSelectedIdx(prevIndex => (prevIndex < lastIndex ? prevIndex + 1 : 0))
         break
       case 'Enter':
-        event.preventDefault()
-        if (selectedIdx >= 0) {
-          console.log(`${result[selectedIdx].name}`)
-        }
+        selectedIdx > -1 && setValues(result[selectedIdx].name)
         break
       default:
         break

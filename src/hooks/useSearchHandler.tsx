@@ -7,7 +7,7 @@ import { useDebounce } from './useDebounce'
 
 const useSearchHandler = (searchKeyword: string) => {
   const [result, setResult] = useState<SEARCH_ITEM[]>([])
-  const debouncedValue = useDebounce(searchKeyword)
+  const debouncedValue = useDebounce<string>(searchKeyword, 300)
   const BASE_URL = `/?name=${debouncedValue}`
   const [loading, setLoading] = useState(false)
   useEffect(() => {
@@ -36,7 +36,7 @@ const useSearchHandler = (searchKeyword: string) => {
     handleSearch()
   }, [debouncedValue])
 
-  return { result, loading }
+  return { result, loading, debouncedValue }
 }
 
 export default useSearchHandler

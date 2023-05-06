@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
-const useKeyHandler = (result: any): any => {
+import { SEARCH_ITEM } from '../types'
+
+const useKeyHandler = (result: SEARCH_ITEM[], debouncedValue: string) => {
   const [selectedIdx, setSelectedIdx] = useState(-1)
   const handleKeyUpDown: any = (event: React.KeyboardEvent) => {
     const { key } = event
@@ -34,7 +36,11 @@ const useKeyHandler = (result: any): any => {
     }
   }
 
-  return { handleKeyUpDown, selectedIdx }
+  useEffect(() => {
+    setSelectedIdx(-1)
+  }, [debouncedValue])
+
+  return { handleKeyUpDown, selectedIdx, setSelectedIdx }
 }
 
 export default useKeyHandler

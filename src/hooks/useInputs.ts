@@ -1,17 +1,13 @@
 import { useState } from 'react'
 
-const useInputs = (initialValue: Record<string, string>) => {
+const useInputs = (initialValue: string) => {
   const [values, setValues] = useState(initialValue)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setValues({
-      ...values,
-      [name]: value
-    })
+    setValues(e.target.value)
   }
 
-  return { values, handleChange, setValues }
+  return { values, setValues, handleChange }
 }
 
 export default useInputs

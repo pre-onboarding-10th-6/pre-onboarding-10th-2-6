@@ -13,5 +13,7 @@ export const setRecentKeywords = (search: string) => {
 }
 
 export const getRecentKeywords = () => {
-  return JSON.parse(sessionStorage.getItem(RECENT_KEYWORDS) as string)
+  return JSON.parse(sessionStorage.getItem(RECENT_KEYWORDS) as string) === null
+    ? []
+    : JSON.parse(sessionStorage.getItem(RECENT_KEYWORDS) as string)
 }

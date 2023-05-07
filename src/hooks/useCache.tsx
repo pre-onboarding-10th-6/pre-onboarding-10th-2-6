@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 
 import { SearchData } from '../types'
 
@@ -28,12 +28,7 @@ const getNewResponse = (response: Response) => {
   })
 }
 
-interface Props {
-  cacheStorageName: string
-  searchInput: string
-}
-
-const useCache = ({ cacheStorageName, searchInput }: Props) => {
+const useCache = (cacheStorageName: string) => {
   const apiCallCnt = useRef(0)
   const [cachedData, setCachedData] = useState<SearchData[]>([])
 
@@ -64,18 +59,17 @@ const useCache = ({ cacheStorageName, searchInput }: Props) => {
     await cache.put(searchInput, responseWithHeader)
 
     console.info(`Search API 호출 횟수 : ${(apiCallCnt.current += 1)}`)
-    setCachedData(await response.json())
+    return await response.json()
   }
 
-  useEffect(() => {
-    if (searchInput !== '') {
-      removeExpiredCache(cacheStorageName).then(async () => {
-        await fetchData(cacheStorageName, searchInput)
-      })
-    }
-  }, [searchInput])
+  const fetchCached = async (debouncedInput: string) => {
+    if (debouncedInput === '') return
+    await removeExpiredCache(cacheStorageName)
+    const result = await fetchData(cacheStorageName, debouncedInput)
+    setCachedData(result)
+  }
 
-  return { cachedData, removeExpiredCache, fetchData }
+  return { cachedData, fetchCached }
 }
 
 export default useCache

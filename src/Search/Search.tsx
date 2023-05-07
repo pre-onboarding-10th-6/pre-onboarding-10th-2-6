@@ -2,52 +2,73 @@ import { useState } from 'react'
 import styled from 'styled-components'
 
 import useCache from '../hooks/useCache'
+import { SEARCH_STORAGE } from '../hooks/useCache'
+import useClickOutside from '../hooks/useClickOutside'
 import useDebouncer from '../hooks/useDebounce'
 import useKeyboard from '../hooks/useKeyboard'
 import { ReactComponent as IconSearch } from '../icons/IconSearch.svg'
+import { getRecentKeywords, setRecentKeywords } from '../utils/recentKeywords'
 
-import { getRecentKeywords, setRecentKeywords } from './recentKeywords'
 import SearchList from './SearchList'
 
 const Search = () => {
-  const [isFocus, setIsFocus] = useState(false)
   const [searchInput, setSearchInput] = useState('')
-  const debouncedInput = useDebouncer(searchInput, 200)
-  const { cachedData, removeExpiredCache, fetchData } = useCache({
-    cacheStorageName: 'search',
-    searchInput: debouncedInput
-  })
-  const { focusIndex, searchItemCnt, onKeyDownHandler } = useKeyboard(
-    async () => {
-      console.log(`enter passing : ${cachedData} ${debouncedInput}`)
-      const autoSearch =
-        debouncedInput.length === 0
-          ? getRecentKeywords()[focusIndex]
-          : cachedData[focusIndex - 1].name
+  const [isFocus, setIsFocus] = useState(false)
+  const { ref } = useClickOutside(() => setIsFocus(false))
+  const { cachedData, fetchCached } = useCache(SEARCH_STORAGE)
+  const debounce = useDebouncer(fetchCached, 300)
+  const { focusIndex, searchItemCnt, onKeyDownHandler } = useKeyboard({
+    onEnter() {
+      let autoSearch
+      if (searchInput.length === 0) {
+        if (focusIndex === -1) {
+          alert('값을 입력해주세요')
+          return
+        }
+        autoSearch = getRecentKeywords()[focusIndex]
+      } else {
+        autoSearch = cachedData[focusIndex - 1]?.name
+      }
       setRecentKeywords(autoSearch)
-      setSearchInput(autoSearch)
+      setSearchInput(autoSearch === undefined ? '' : autoSearch)
+      fetchCached(autoSearch)
     }
-  )
+  })
 
   const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setRecentKeywords(debouncedInput)
-    await removeExpiredCache('search')
-    await fetchData('search', searchInput)
+    setRecentKeywords(searchInput)
+    fetchCached(searchInput)
   }
 
   const onChangeHanlder = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchInput(e.target.value)
+    const value = e.target.value
+    setSearchInput(value)
+    debounce(value)
+  }
+
+  const onMouseDownHandler = async (
+    event: React.MouseEvent<HTMLLIElement, MouseEvent>
+  ) => {
+    const { currentTarget } = event
+    const titleElement = currentTarget.childNodes[1] as HTMLElement
+    const subtitleElement = currentTarget.childNodes[2] as
+      | HTMLElement
+      | undefined
+
+    const title = titleElement?.textContent?.trim() ?? ''
+    const subTitle = subtitleElement?.textContent?.trim() ?? ''
+    const search = `${title} ${subTitle}`.trim()
+
+    if (search.length > 0) {
+      setRecentKeywords(search)
+      fetchCached(search)
+      setSearchInput(search)
+    }
   }
 
   return (
-    <Form
-      onSubmit={e =>
-        searchInput === '' ? alert('값을 입력해주세요') : onSubmitHandler(e)
-      }
-      onBlur={() => setIsFocus(false)}
-      onFocus={() => setIsFocus(true)}
-    >
+    <Form ref={ref} onSubmit={onSubmitHandler} onFocus={() => setIsFocus(true)}>
       <SearchBox>
         <input
           type="search"
@@ -63,10 +84,11 @@ const Search = () => {
 
       {isFocus && (
         <SearchList
-          debouncedInput={debouncedInput}
+          searchInput={searchInput}
           cachedData={cachedData ? cachedData : []}
-          focusedItem={focusIndex}
+          focusIndex={focusIndex}
           searchItemCnt={searchItemCnt}
+          onMouseDownHandler={onMouseDownHandler}
         />
       )}
     </Form>

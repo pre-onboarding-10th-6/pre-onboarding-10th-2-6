@@ -1,23 +1,20 @@
-import { useState, useEffect } from 'react'
+import { useCallback, useRef } from 'react'
 
-const useDebouncer = (value: string, delay: number) => {
-  const [debouncedValue, setDebouncedValue] = useState((value = ''))
+function useDebouncer<T extends any[]>(
+  callback: (...args: T) => void,
+  delay: number
+) {
+  const timeoutRef = useRef<NodeJS.Timeout>()
 
-  useEffect(() => {
-    const timerId = setTimeout(() => {
-      setDebouncedValue(value)
-    }, delay)
-
-    return () => {
-      clearTimeout(timerId)
-    }
-  }, [value, delay])
-
-  return debouncedValue
+  return useCallback(
+    (...args: T) => {
+      clearTimeout(timeoutRef.current)
+      timeoutRef.current = setTimeout(() => {
+        callback(...args)
+      }, delay)
+    },
+    [callback, delay]
+  )
 }
 
 export default useDebouncer
-
-// const onChangeHanlder = async (e: React.ChangeEvent<HTMLInputElement>) => {
-//   setSearchState({ ...searchState, input: e.target.value })
-// }

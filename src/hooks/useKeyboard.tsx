@@ -1,6 +1,10 @@
 import { useState, useRef } from 'react'
 
-const useKeyboard = (enterFunc: () => void) => {
+interface Props {
+  onEnter?: () => void
+}
+
+const useKeyboard = ({ onEnter }: Props) => {
   const searchItemCnt = useRef<HTMLUListElement | null>(null)
   const [focusIndex, setFocusIndex] = useState<number>(-1)
 
@@ -21,12 +25,10 @@ const useKeyboard = (enterFunc: () => void) => {
         break
       }
       case 'Enter': {
+        if (focusIndex === -1) break
         e.preventDefault()
-        enterFunc()
+        onEnter && onEnter()
         setFocusIndex(-1)
-        break
-      }
-      default: {
         break
       }
     }

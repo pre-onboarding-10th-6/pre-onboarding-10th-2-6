@@ -12,7 +12,7 @@
 
 <br/><br/>
 
-## 캐시 스토리지로 로컬 캐싱 구현
+## 1. 캐시 스토리지로 로컬 캐싱 구현
 
 ```javascript
 async function handleSearch() {
@@ -43,10 +43,7 @@ async function handleSearch() {
 
 <br/><br/>
 
-## expire time 구현
-
-  <br/>
-  캐시가 많이 쌓이게 되면 그만큼 캐시 내부에서 데이터를 찾는 시간이 늘어나 오히려 성능 측면에서 좋지 않다. 또한, 추천 검색어 API에서 제공되는 데이터는 시간이 지날수록 새로운 정보로 업데이트 되는 경우가 많다. 이를 고려하여 최신 정보를 유지하기 위해 1시간으로 설정했다.
+## 2. expire time 구현
 
 ```javascript
 await cacheStorage.put(
@@ -59,9 +56,12 @@ await cacheStorage.put(
 )
 ```
 
+캐시가 많이 쌓이게 되면 그만큼 캐시 내부에서 데이터를 찾는 시간이 늘어나 오히려 성능 측면에서 좋지 않다. 또한, 추천 검색어 API에서 제공되는 데이터는 시간이 지날수록 새로운 정보로 업데이트 되는 경우가 많다. 이를 고려하여 최신 정보를 유지하기 위해 1시간으로 설정했다.
+<br/>
+
 <br/><br/>
 
-## API 호출 횟수 줄이는 전략
+## 3. API 호출 횟수 줄이는 전략
 
 ```javascript
 export const useDebounce = <T>(value: T, delay: number) => {
@@ -85,7 +85,7 @@ input 이벤트가 발생할 때마다 타이머를 설정하고, 300ms동안 �
 
 <br/><br/>
 
-## 키보드만으로 추천 검색어 이동
+## 4. 키보드만으로 추천 검색어 이동
 
 ```javascript
 const [selectedIdx, setSelectedIdx] = useState(-1)

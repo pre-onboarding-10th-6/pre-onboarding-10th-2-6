@@ -2,7 +2,7 @@ import styled from 'styled-components'
 
 import { ReactComponent as IconSearch } from '../icons/IconSearch.svg'
 import { SearchData } from '../types'
-import { getRecentKeywords } from '../utils/recentKeywords'
+import { getRecentKeywords, setRecentKeywords } from '../utils/recentKeywords'
 
 interface Props {
   searchInput: string
@@ -19,7 +19,7 @@ interface ItemProps {
   classStatement: string
 }
 
-const SearchList = ({
+const Dropdown = ({
   searchInput,
   focusIndex,
   searchItemCnt,
@@ -28,12 +28,12 @@ const SearchList = ({
 }: Props) => {
   const recentKeywords = getRecentKeywords()
 
-  const SearchListItem = ({ children, classStatement }: ItemProps) => {
+  const Item = ({ children, classStatement }: ItemProps) => {
     return (
-      <Item className={classStatement} onMouseDown={onMouseDownHandler}>
+      <DropdownItem className={classStatement} onMouseDown={onMouseDownHandler}>
         <IconSearch />
         <p>{children}</p>
-      </Item>
+      </DropdownItem>
     )
   }
 
@@ -43,30 +43,30 @@ const SearchList = ({
         <>
           <Text>최근 검색어</Text>
           {recentKeywords?.map((keyword: string, idx: number) => (
-            <SearchListItem
+            <Item
               key={idx}
               classStatement={focusIndex === idx ? 'focused' : ''}
             >
               {keyword}
-            </SearchListItem>
+            </Item>
           ))}
         </>
       ) : cachedData.length === 0 ? (
         <p>검색 결과가 없습니다.</p>
       ) : (
         <>
-          <SearchListItem classStatement={focusIndex === 0 ? 'focused' : ''}>
+          <Item classStatement={focusIndex === 0 ? 'focused' : ''}>
             <Bold>{searchInput}</Bold>
-          </SearchListItem>
+          </Item>
           <Text>추천 검색어</Text>
           {cachedData.slice(0, 7).map((arr, idx: number) => (
-            <SearchListItem
+            <Item
               key={arr.id}
               classStatement={focusIndex === idx + 1 ? 'focused' : ''}
             >
               <Bold>{searchInput}</Bold>
               {arr.name.split(searchInput)[1]}
-            </SearchListItem>
+            </Item>
           ))}
         </>
       )}
@@ -74,7 +74,7 @@ const SearchList = ({
   )
 }
 
-export default SearchList
+export default Dropdown
 
 const List = styled.ul`
   border: 1px solid rgb(194, 200, 206);
@@ -88,7 +88,7 @@ const List = styled.ul`
   gap: 12px 16px;
 `
 
-const Item = styled.li`
+const DropdownItem = styled.li`
   list-style: none;
   cursor: pointer;
   display: flex;

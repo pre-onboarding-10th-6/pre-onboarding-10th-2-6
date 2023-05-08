@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 
-import Search from './Search/Search'
+// import Search from './search/index'
+import Search from './search'
 
 function App() {
   return (

@@ -1,6 +1,9 @@
 import { useRef, useState } from 'react'
 
 import { SearchData } from '../types'
+import { setRecentKeywords } from '../utils/recentKeywords'
+
+import useDebouncer from './useDebounce'
 
 export const SEARCH_URL = `http://localhost:3000/api/v1/search-conditions/?name=`
 export const SEARCH_STORAGE = 'search'
@@ -62,14 +65,23 @@ const useCache = (cacheStorageName: string) => {
     return await response.json()
   }
 
-  const fetchCached = async (debouncedInput: string) => {
+  const fetchCached = async (
+    debouncedInput: string,
+    setRecentKeyword: boolean
+  ) => {
     if (debouncedInput === '') return
+    if (setRecentKeyword) setRecentKeywords(debouncedInput)
+
     await removeExpiredCache(cacheStorageName)
     const result = await fetchData(cacheStorageName, debouncedInput)
     setCachedData(result)
   }
 
-  return { cachedData, fetchCached }
+  return {
+    cachedData,
+    fetchCached,
+    fetchDebounced: useDebouncer(fetchCached, 300)
+  }
 }
 
 export default useCache

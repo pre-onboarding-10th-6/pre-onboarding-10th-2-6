@@ -12,9 +12,4 @@ const instance: AxiosInstance = axios.create(defaultOptions)
 export const searchAPI = (
   debouncedValue: string
 ): Promise<AxiosResponse<SEARCH_ITEM[]>> =>
-  instance.get(`/?name=${debouncedValue}`, {
-    headers: {
-      //TODO
-      'Cache-Control': 'max-age=300'
-    }
-  })
+  instance.get(`/?name=${debouncedValue}`)
